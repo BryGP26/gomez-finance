@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gomez Finance</title>
+  
+  <div id="formulario-gastos" style="padding: 20px; border: 1px solid #ccc; border-radius: 10px; max-width: 400px; margin: 20px auto;">
+  <h3>Registrar Nuevo Gasto</h3>
+  
+  <label>Descripción:</label><br>
+  <input type="text" id="descripcion" placeholder="Ej: Pago de luz" style="width: 100%; margin-bottom: 10px;"><br>
+  
+  <label>Monto (₡):</label><br>
+  <input type="number" id="monto" placeholder="Ej: 15000" style="width: 100%; margin-bottom: 20px;"><br>
+  
+  <button id="btnGuardar" style="background-color: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; width: 100%; cursor: pointer;">
+    Guardar Gasto
+  </button>
+</div>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -196,6 +210,35 @@ function exportarExcel(){
 
 </script>
 <script type="module">
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Inicializar la base de datos
+const db = getFirestore(app);
+
+// Escuchar el clic del botón
+document.getElementById("btnGuardar").addEventListener("click", async () => {
+  const desc = document.getElementById("descripcion").value;
+  const monto = document.getElementById("monto").value;
+
+  if (desc !== "" && monto !== "") {
+    try {
+      // Guardar en la colección "gastos"
+      await addDoc(collection(db, "gastos"), {
+        descripcion: desc,
+        monto: Number(monto),
+        fecha: new Date()
+      });
+      alert("¡Gasto guardado con éxito!");
+      document.getElementById("descripcion").value = "";
+      document.getElementById("monto").value = "";
+    } catch (e) {
+      console.error("Error al guardar: ", e);
+    }
+  } else {
+    alert("Por favor llena ambos campos");
+  }
+});
+
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
   // TODO: Add SDKs for Firebase products that you want to use
