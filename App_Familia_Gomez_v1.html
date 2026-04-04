@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gómez Finance - Control Avanzado</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --primary: #1a73e8; --success: #28a745; --bg: #f0f2f5; --accent: #ff9800; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2, h3 { color: var(--primary); text-align: center; margin-top: 0; }
+        
+        /* Formulario en dos columnas para PC, una para Móvil */
+        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .grid-form { grid-template-columns: 1fr; } }
+        
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; color: #555; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
+        #btnGuardar { background: var(--success); }
+        #btnExportar { background: var(--accent); }
+
+        /* Tabla y Totales */
+        .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 20px; margin-bottom: 20px; }
+        .tabla-container { overflow-x: auto; background: white; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th { background: #eee; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .monto-celda { font-weight: bold; color: #d32f2f; text-align: right; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Gómez-Finance 💰</h2>
+        <div class="grid-form">
+            <div>
+                <label>Fecha Completa</label>
+                <input type="date" id="fecha">
+            </div>
+            <div>
+                <label>Mes de Registro</label>
+                <select id="mes">
+                    <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
+                    <option value="Marzo">Marzo</option><option value="Abril" selected>Abril</option>
+                    <option value="Mayo">Mayo</option><option value="Junio">Junio</option>
+                    <option value="Julio">Julio</option><option value="Agosto">Agosto</option>
+                    <option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
+                    <option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
+                </select>
+            </div>
+            <div>
+                <label>Categoría</label>
+                <select id="categoria">
+                    <option value="Supermercado">🛒 Supermercado</option>
+                    <option value="Combustible">⛽ Combustible</option>
+                    <option value="Salud">💊 Salud</option>
+                    <option value="Diario">📅 Diario</option>
+                    <option value="Servicios">💡 Servicios</option>
+                    <option value="Otros">✨ Otros</option>
+                </select>
+            </div>
+            <div>
+                <label>Comercio</label>
+                <input type="text" id="comercio" placeholder="Ej: Walmart, Shell...">
+            </div>
+            <div style="grid-column: span 1;">
+                <label>Detalle del gasto</label>
+                <input type="text" id="detalle" placeholder="Ej: Frutas y verduras">
+            </div>
+            <div>
+                <label>Monto (₡)</label>
+                <input type="number" id="monto" placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button id="btnGuardar">Guardar Gasto</button>
+            <button id="btnExportar">Exportar Excel 📊</button>
+        </div>
+    </div>
+
+    <div class="total-box">
+        Total Acumulado: <span id="totalSuma">₡0</span>
+    </div>
+
+    <div class="card">
+        <h3>Historial de Movimientos</h3>
+        <div class="tabla-container">
+            <table id="tablaGastos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Mes</th>
+                        <th>Comercio</th>
+                        <th>Categoría</th>
+                        <th>Detalle</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCq1uBRlyOeez3sbwZrpngvXVAEg8lb2hw",
+        authDomain: "gomez-finance-94b2c.firebaseapp.com",
+        projectId: "gomez-finance-94b2c",
+        storageBucket: "gomez-finance-94b2c.firebasestorage.app",
+        messagingSenderId: "23675517740",
+        appId: "1:23675517740:web:6d2b44cd72b04fba29ca89"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    document.getElementById('fecha').valueAsDate = new Date();
+    let datosParaExcel = [];
+
+    // --- GUARDAR ---
+    document.getElementById("btnGuardar").addEventListener("click", async () => {
+        const fecha = document.getElementById("fecha").value;
+        const anio = fecha.split('-')[0];
+        const mes = document.getElementById("mes").value;
+        const cat = document.getElementById("categoria").value;
+        const com = document.getElementById("comercio").value;
+        const det = document.getElementById("detalle").value;
+        const mon = document.getElementById("monto").value;
+
+        if (fecha && mon && com) {
+            try {
+                await addDoc(collection(db, "gastos"), {
+                    fecha, anio, mes, categoria: cat, comercio: com,
+                    detalle: det, monto: Number(mon), timestamp: new Date()
+                });
+                document.getElementById("comercio").value = "";
+                document.getElementById("detalle").value = "";
+                document.getElementById("monto").value = "";
+                alert("¡Gasto guardado!");
+            } catch (e) { alert("Error: " + e.message); }
+        } else { alert("Faltan campos obligatorios"); }
+    });
+
+    // --- LEER Y SUMAR ---
+    const q = query(collection(db, "gastos"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const tbody = document.getElementById("cuerpoTabla");
+        let sumaTotal = 0;
+        tbody.innerHTML = "";
+        datosParaExcel = [];
+
+        snapshot.forEach((doc) => {
+            const d = doc.data();
+            sumaTotal += d.monto;
+            
+            // Guardar para Excel
+            datosParaExcel.push({
+                Fecha: d.fecha, Año: d.anio, Mes: d.mes, 
+                Comercio: d.comercio, Categoria: d.categoria, 
+                Detalle: d.detalle, Monto: d.monto
+            });
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${d.fecha}</td>
+                    <td>${d.mes}</td>
+                    <td>${d.comercio}</td>
+                    <td>${d.categoria}</td>
+                    <td>${d.detalle}</td>
+                    <td class="monto-celda">₡${d.monto.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        document.getElementById("totalSuma").innerText = `₡${sumaTotal.toLocaleString()}`;
+    });
+
+    // --- EXPORTAR A EXCEL ---
+    document.getElementById("btnExportar").addEventListener("click", () => {
+        if(datosParaExcel.length === 0) return alert("No hay datos para exportar");
+        const ws = XLSX.utils.json_to_sheet(datosParaExcel);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Gastos");
+        XLSX.writeFile(wb, "Gomez_Finance_Reporte.xlsx");
+    });
+</script>
+</body>
+</html>

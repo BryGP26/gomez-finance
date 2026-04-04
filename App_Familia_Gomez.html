@@ -2,50 +2,146 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gómez Finance - Control Avanzado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gómez Finance - Dashboard Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #1a73e8; --success: #28a745; --bg: #f0f2f5; --accent: #ff9800; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 800px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2, h3 { color: var(--primary); text-align: center; margin-top: 0; }
-        
-        /* Formulario en dos columnas para PC, una para Móvil */
-        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media (max-width: 600px) { .grid-form { grid-template-columns: 1fr; } }
-        
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; color: #555; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
-        #btnGuardar { background: var(--success); }
-        #btnExportar { background: var(--accent); }
+        :root {
+            --primary: #2563eb; --bg: #f5f6fb; --card: #ffffff; --ink: #0f1117;
+            --muted: #8b8fa8; --border: #e4e6f0; --danger: #ef4444; --success: #16a34a;
+            --radius: 14px; --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
 
-        /* Tabla y Totales */
-        .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 20px; margin-bottom: 20px; }
-        .tabla-container { overflow-x: auto; background: white; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
-        th { background: #eee; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .monto-celda { font-weight: bold; color: #d32f2f; text-align: right; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); padding-bottom: 40px; }
+
+        .header { background: var(--ink); padding: 18px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .header-logo { font-size: 20px; font-weight: 700; }
+        .header-logo span { color: #60a5fa; }
+
+        .nav-tabs { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius); padding: 6px; margin: 20px auto; max-width: 860px; box-shadow: var(--shadow); width: calc(100% - 32px); }
+        .nav-tab { flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s; text-align: center; font-size: 11px; text-transform: uppercase; }
+        .nav-tab.active { background: var(--ink); color: #fff; }
+
+        .container { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+        .view { display: none; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 16px; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 15px; background: #fff; }
+        
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-ghost { background: var(--bg); color: var(--ink); border: 1px solid var(--border); }
+
+        /* Widget de Suma Rápida */
+        .live-sum-card { background: var(--ink); color: white; border-radius: var(--radius); padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .live-sum-card small { font-size: 11px; opacity: 0.7; text-transform: uppercase; font-weight: 700; }
+        .live-sum-card div { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700; color: #60a5fa; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+        .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+        .stat-value { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; margin-top: 5px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 14px; color: var(--muted); border-bottom: 2px solid var(--border); font-size: 11px; }
+        td { padding: 14px; border-bottom: 1px solid var(--border); }
+        .monto-col { font-family: 'DM Mono', monospace; font-weight: bold; text-align: right; color: var(--danger); }
+        .btn-icon { border: none; background: #f1f5f9; cursor: pointer; padding: 8px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <div class="header-logo">Gómez<span>Finance</span> 💎</div>
+    <div id="reloj" style="font-size: 12px; font-family: 'DM Mono';"></div>
+</div>
+
+<nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('gastos')">Registro</button>
+    <button class="nav-tab" onclick="switchTab('historial')">Historial</button>
+    <button class="nav-tab" onclick="switchTab('presupuesto')">Ajustes</button>
+    <button class="nav-tab" onclick="switchTab('resumen')">Resumen</button>
+</nav>
+
 <div class="container">
-    <div class="card">
-        <h2>Gómez-Finance 💰</h2>
-        <div class="grid-form">
-            <div>
-                <label>Fecha Completa</label>
-                <input type="date" id="fecha">
+    
+    <div id="view-gastos" class="view active">
+        <div class="card">
+            <div class="card-title">📝 Nuevo Gasto</div>
+            <input type="hidden" id="editId">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" id="fecha">
+                </div>
+                <div class="form-group">
+                    <label>Mes de Control</label>
+                    <select id="mes" onchange="actualizarSumaRegistro()">
+                        <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
+                        <option value="Marzo">Marzo</option><option value="Abril" selected>Abril</option>
+                        <option value="Mayo">Mayo</option><option value="Junio">Junio</option>
+                        <option value="Julio">Julio</option><option value="Agosto">Agosto</option>
+                        <option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
+                        <option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="categoria">
+                        <option value="Supermercado">🛒 Supermercado</option>
+                        <option value="Combustible">⛽ Combustible</option>
+                        <option value="Salud">💊 Salud</option>
+                        <option value="Restaurantes">🍔 Restaurantes</option>
+                        <option value="Servicios">💡 Servicios</option>
+                        <option value="Otros">✨ Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Comercio / Lugar</label>
+                    <input type="text" id="comercio" placeholder="Ej: Walmart">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Monto del Gasto (₡)</label>
+                    <input type="number" id="monto" placeholder="0">
+                </div>
             </div>
-            <div>
-                <label>Mes de Registro</label>
-                <select id="mes">
+            
+            <div class="btn-row">
+                <button id="btnGuardar" class="btn btn-primary">💾 Guardar Movimiento</button>
+                <button id="btnActualizar" class="btn btn-success" style="display:none;">🔄 Actualizar</button>
+                <button id="btnCancelar" class="btn btn-ghost" style="display:none;">Cancelar</button>
+            </div>
+
+            <div class="live-sum-card">
+                <div>
+                    <small id="txtSumaMes">Total Acumulado Abril</small>
+                    <div id="sumaRegistro">₡0</div>
+                </div>
+                <span style="font-size: 24px;">📈</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-historial" class="view">
+        <div class="card">
+            <div class="card-title">📋 Movimientos</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="filtroTexto" placeholder="🔍 Buscar..." onkeyup="filtrar()">
+                <select id="filtroMes" onchange="filtrar()">
+                    <option value="Todos">Todos los meses</option>
                     <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
                     <option value="Marzo">Marzo</option><option value="Abril" selected>Abril</option>
                     <option value="Mayo">Mayo</option><option value="Junio">Junio</option>
@@ -54,64 +150,46 @@
                     <option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
                 </select>
             </div>
-            <div>
-                <label>Categoría</label>
-                <select id="categoria">
-                    <option value="Supermercado">🛒 Supermercado</option>
-                    <option value="Combustible">⛽ Combustible</option>
-                    <option value="Salud">💊 Salud</option>
-                    <option value="Diario">📅 Diario</option>
-                    <option value="Servicios">💡 Servicios</option>
-                    <option value="Otros">✨ Otros</option>
-                </select>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Detalle</th>
+                            <th style="text-align:right">Monto</th>
+                            <th style="text-align:center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla"></tbody>
+                </table>
             </div>
-            <div>
-                <label>Comercio</label>
-                <input type="text" id="comercio" placeholder="Ej: Walmart, Shell...">
-            </div>
-            <div style="grid-column: span 1;">
-                <label>Detalle del gasto</label>
-                <input type="text" id="detalle" placeholder="Ej: Frutas y verduras">
-            </div>
-            <div>
-                <label>Monto (₡)</label>
-                <input type="number" id="monto" placeholder="0.00">
-            </div>
-        </div>
-
-        <div class="btn-group">
-            <button id="btnGuardar">Guardar Gasto</button>
-            <button id="btnExportar">Exportar Excel 📊</button>
         </div>
     </div>
 
-    <div class="total-box">
-        Total Acumulado: <span id="totalSuma">₡0</span>
-    </div>
-
-    <div class="card">
-        <h3>Historial de Movimientos</h3>
-        <div class="tabla-container">
-            <table id="tablaGastos">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Mes</th>
-                        <th>Comercio</th>
-                        <th>Categoría</th>
-                        <th>Detalle</th>
-                        <th>Monto</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpoTabla"></tbody>
-            </table>
+    <div id="view-presupuesto" class="view">
+        <div class="card">
+            <div class="card-title">⚙️ Configuración</div>
+            <label>Presupuesto Mensual (₡)</label>
+            <input type="number" id="inputPresupuesto" value="0" onchange="calcStats()">
         </div>
     </div>
+
+    <div id="view-resumen" class="view">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Límite</div><div class="stat-value" id="valPres">₡0</div></div>
+            <div class="stat-card"><div class="stat-label">Gastado</div><div class="stat-value" id="valGasto" style="color:var(--danger)">₡0</div></div>
+            <div class="stat-card"><div class="stat-label">Libre</div><div class="stat-value" id="valLibre" style="color:var(--success)">₡0</div></div>
+        </div>
+        <div class="card">
+            <button class="btn btn-success" id="btnExportar" style="width: 100%;">📥 Exportar Excel</button>
+        </div>
+    </div>
+
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCq1uBRlyOeez3sbwZrpngvXVAEg8lb2hw",
@@ -124,74 +202,140 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const colRef = collection(db, "gastos");
+
+    let todosLosGastos = [];
     document.getElementById('fecha').valueAsDate = new Date();
-    let datosParaExcel = [];
 
-    // --- GUARDAR ---
-    document.getElementById("btnGuardar").addEventListener("click", async () => {
-        const fecha = document.getElementById("fecha").value;
-        const anio = fecha.split('-')[0];
-        const mes = document.getElementById("mes").value;
-        const cat = document.getElementById("categoria").value;
+    // RELOJ
+    setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+    // NAVEGACIÓN
+    window.switchTab = (tabId) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('view-' + tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    };
+
+    // GUARDAR
+    document.getElementById("btnGuardar").onclick = async () => {
         const com = document.getElementById("comercio").value;
-        const det = document.getElementById("detalle").value;
         const mon = document.getElementById("monto").value;
+        if(!com || !mon) return alert("Completa los datos");
 
-        if (fecha && mon && com) {
-            try {
-                await addDoc(collection(db, "gastos"), {
-                    fecha, anio, mes, categoria: cat, comercio: com,
-                    detalle: det, monto: Number(mon), timestamp: new Date()
-                });
-                document.getElementById("comercio").value = "";
-                document.getElementById("detalle").value = "";
-                document.getElementById("monto").value = "";
-                alert("¡Gasto guardado!");
-            } catch (e) { alert("Error: " + e.message); }
-        } else { alert("Faltan campos obligatorios"); }
-    });
+        const data = {
+            fecha: document.getElementById("fecha").value,
+            mes: document.getElementById("mes").value,
+            categoria: document.getElementById("categoria").value,
+            comercio: com,
+            monto: Number(mon),
+            timestamp: new Date()
+        };
 
-    // --- LEER Y SUMAR ---
-    const q = query(collection(db, "gastos"), orderBy("timestamp", "desc"));
-    onSnapshot(q, (snapshot) => {
+        await addDoc(colRef, data);
+        limpiar();
+    };
+
+    // ESCUCHAR FIREBASE
+    onSnapshot(query(colRef, orderBy("timestamp", "desc")), (snap) => {
         const tbody = document.getElementById("cuerpoTabla");
-        let sumaTotal = 0;
         tbody.innerHTML = "";
-        datosParaExcel = [];
-
-        snapshot.forEach((doc) => {
-            const d = doc.data();
-            sumaTotal += d.monto;
+        todosLosGastos = [];
+        
+        snap.forEach(d => {
+            const g = { id: d.id, ...d.data() };
+            todosLosGastos.push(g);
             
-            // Guardar para Excel
-            datosParaExcel.push({
-                Fecha: d.fecha, Año: d.anio, Mes: d.mes, 
-                Comercio: d.comercio, Categoria: d.categoria, 
-                Detalle: d.detalle, Monto: d.monto
-            });
-
-            tbody.innerHTML += `
-                <tr>
-                    <td>${d.fecha}</td>
-                    <td>${d.mes}</td>
-                    <td>${d.comercio}</td>
-                    <td>${d.categoria}</td>
-                    <td>${d.detalle}</td>
-                    <td class="monto-celda">₡${d.monto.toLocaleString()}</td>
-                </tr>
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${g.fecha.split('-').reverse().slice(0,2).join('/')}</td>
+                <td><b>${g.comercio}</b><br><small style="color:var(--muted)">${g.categoria}</small></td>
+                <td class="monto-col">₡${g.monto.toLocaleString()}</td>
+                <td style="text-align:center">
+                    <button class="btn-icon" onclick="prepararEdit('${g.id}')">✏️</button>
+                </td>
             `;
+            tbody.appendChild(tr);
         });
-        document.getElementById("totalSuma").innerText = `₡${sumaTotal.toLocaleString()}`;
+        actualizarSumaRegistro();
+        calcStats();
     });
 
-    // --- EXPORTAR A EXCEL ---
-    document.getElementById("btnExportar").addEventListener("click", () => {
-        if(datosParaExcel.length === 0) return alert("No hay datos para exportar");
-        const ws = XLSX.utils.json_to_sheet(datosParaExcel);
+    // SUMA EN PESTAÑA DE REGISTRO
+    window.actualizarSumaRegistro = () => {
+        const mesActual = document.getElementById("mes").value;
+        document.getElementById("txtSumaMes").innerText = "Total Acumulado " + mesActual;
+        
+        const total = todosLosGastos
+            .filter(g => g.mes === mesActual)
+            .reduce((acc, curr) => acc + curr.monto, 0);
+            
+        document.getElementById("sumaRegistro").innerText = "₡" + total.toLocaleString();
+        window.currentTotalSum = total;
+    };
+
+    // EDITAR & BORRAR (Resumido)
+    window.prepararEdit = (id) => {
+        const g = todosLosGastos.find(x => x.id === id);
+        document.getElementById("editId").value = id;
+        document.getElementById("fecha").value = g.fecha;
+        document.getElementById("mes").value = g.mes;
+        document.getElementById("categoria").value = g.categoria;
+        document.getElementById("comercio").value = g.comercio;
+        document.getElementById("monto").value = g.monto;
+        document.getElementById("btnGuardar").style.display = "none";
+        document.getElementById("btnActualizar").style.display = "flex";
+        document.getElementById("btnCancelar").style.display = "flex";
+        switchTab('gastos');
+    };
+
+    document.getElementById("btnActualizar").onclick = async () => {
+        const id = document.getElementById("editId").value;
+        await updateDoc(doc(db, "gastos", id), {
+            fecha: document.getElementById("fecha").value,
+            mes: document.getElementById("mes").value,
+            categoria: document.getElementById("categoria").value,
+            comercio: document.getElementById("comercio").value,
+            monto: Number(document.getElementById("monto").value)
+        });
+        limpiar();
+        switchTab('historial');
+    };
+
+    function limpiar() {
+        document.getElementById("comercio").value = "";
+        document.getElementById("monto").value = "";
+        document.getElementById("editId").value = "";
+        document.getElementById("btnGuardar").style.display = "flex";
+        document.getElementById("btnActualizar").style.display = "none";
+        document.getElementById("btnCancelar").style.display = "none";
+    }
+
+    window.calcStats = () => {
+        const pres = Number(document.getElementById("inputPresupuesto").value);
+        const libre = pres - window.currentTotalSum;
+        document.getElementById("valPres").innerText = `₡${pres.toLocaleString()}`;
+        document.getElementById("valGasto").innerText = `₡${(window.currentTotalSum || 0).toLocaleString()}`;
+        document.getElementById("valLibre").innerText = `₡${libre.toLocaleString()}`;
+    };
+
+    window.filtrar = () => {
+        const txt = document.getElementById("filtroTexto").value.toLowerCase();
+        const mesF = document.getElementById("filtroMes").value;
+        document.querySelectorAll("#cuerpoTabla tr").forEach(f => {
+            const matchTxt = f.innerText.toLowerCase().includes(txt);
+            const matchMes = (mesF === "Todos" || f.innerText.includes(mesF));
+            f.style.display = (matchTxt && matchMes) ? "" : "none";
+        });
+    };
+
+    document.getElementById("btnExportar").onclick = () => {
+        const ws = XLSX.utils.json_to_sheet(todosLosGastos);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Gastos");
-        XLSX.writeFile(wb, "Gomez_Finance_Reporte.xlsx");
-    });
+        XLSX.writeFile(wb, "Reporte_Gomez.xlsx");
+    };
 </script>
 </body>
 </html>
