@@ -257,5 +257,63 @@ document.getElementById("btnGuardar").addEventListener("click", async () => {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 </script>
+<div id="app-container" style="max-width: 500px; margin: auto; font-family: sans-serif; padding: 20px;">
+    <div style="background: #f4f4f4; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #333;">Registrar Gasto</h2>
+        
+        <label>Categoría:</label>
+        <select id="categoria" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <option value="Gasolina">Gasolina</option>
+            <option value="Comida">Comida</option>
+            <option value="Servicios">Servicios</option>
+            <option value="Otros">Otros</option>
+        </select>
+
+        <label>Descripción:</label>
+        <input type="text" id="descripcion" placeholder="¿En qué se gastó?" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+
+        <label>Monto (₡):</label>
+        <input type="number" id="monto" placeholder="Monto total" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+
+        <button id="btnGuardar" style="width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+            Guardar en la Nube
+        </button>
+    </div>
+</div>
+
+<script type="module">
+  // Importamos lo necesario de Firestore
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // app es la variable que definiste arriba en tu configuración
+  const db = getFirestore(app);
+
+  document.getElementById("btnGuardar").addEventListener("click", async () => {
+    const categoria = document.getElementById("categoria").value;
+    const descripcion = document.getElementById("descripcion").value;
+    const monto = document.getElementById("monto").value;
+
+    if (descripcion && monto) {
+      try {
+        await addDoc(collection(db, "gastos"), {
+          categoria: categoria,
+          descripcion: descripcion,
+          monto: Number(monto),
+          fecha: new Date().toISOString().split('T')[0], // Guarda solo AAAA-MM-DD
+          mes: "Abril" // Podrías hacerlo dinámico después
+        });
+        alert("¡Gasto guardado para la Familia Gómez!");
+        // Limpiar campos
+        document.getElementById("descripcion").value = "";
+        document.getElementById("monto").value = "";
+      } catch (error) {
+        console.error("Error al guardar: ", error);
+        alert("Error al conectar con Firebase.");
+      }
+    } else {
+      alert("Por favor, completa los datos.");
+    }
+  });
+</script>
 </body>
 </html>
