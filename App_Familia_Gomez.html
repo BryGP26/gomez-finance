@@ -2,124 +2,176 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gómez Finance - Registro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gómez Finance Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --primary: #1a73e8;
-            --success: #28a745;
-            --bg: #f0f2f5;
+            --primary: #2563eb;
+            --success: #22c55e;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-sec: #64748b;
         }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; 
-            padding: 15px; 
-            display: flex; 
-            justify-content: center; 
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px 15px 100px;
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
         }
-        .card { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 15px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 450px; 
+
+        /* Estética de App Móvil */
+        .app-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
+
+        .header-status {
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 28px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header-status small { font-weight: 500; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .header-status div { font-size: 2.5rem; font-weight: 800; margin-top: 8px; }
+
+        /* Formulario Responsivo */
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; color: var(--text-sec); text-transform: uppercase; }
         
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 14px; }
-        select, input { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 16px; 
-            outline-color: var(--primary);
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #f1f5f9;
+            border-radius: 14px;
+            font-size: 16px;
+            background: #f8fafc;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
         }
+
+        input:focus { border-color: var(--primary); background: white; outline: none; }
+
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .btn-main:active { transform: scale(0.96); }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: var(--text-sec);
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* Lista de Movimientos Tipo Tarjeta */
+        .history-section h3 { font-size: 1.2rem; margin-left: 5px; color: var(--text-main); }
         
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background-color: var(--success); 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.3s; 
+        .item-gasto {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        button:active { transform: scale(0.98); background-color: #218838; }
+
+        .item-details b { display: block; font-size: 1rem; margin-bottom: 2px; }
+        .item-details span { font-size: 0.75rem; color: var(--text-sec); font-weight: 500; }
         
-        .success-msg { 
-            color: var(--success); 
-            text-align: center; 
-            font-weight: bold; 
-            display: none; 
-            margin-top: 15px;
-            padding: 10px;
-            background: #e8f5e9;
-            border-radius: 8px;
-        }
+        .item-price { font-weight: 800; color: #ef4444; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Gómez-Finance 💰</h2>
-    <p class="subtitle">Registrar Nuevo Gasto</p>
+<div class="container">
+    <div class="header-status">
+        <small id="labelMes">Gastos de Abril</small>
+        <div id="totalDisplay">₡0</div>
+    </div>
 
-    <label>Fecha</label>
-    <input type="date" id="fecha">
+    <div class="app-card">
+        <div class="form-group">
+            <label>Mes de Registro</label>
+            <select id="selectMes">
+                <option value="Enero">Enero</option><option value="Febrero">Febrero</option>
+                <option value="Marzo">Marzo</option><option value="Abril" selected>Abril</option>
+                <option value="Mayo">Mayo</option><option value="Junio">Junio</option>
+                <option value="Julio">Julio</option><option value="Agosto">Agosto</option>
+                <option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option>
+                <option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option>
+            </select>
+        </div>
 
-    <label>Mes</label>
-    <select id="mes">
-        <option value="Enero">Enero</option>
-        <option value="Febrero">Febrero</option>
-        <option value="Marzo">Marzo</option>
-        <option value="Abril" selected>Abril</option>
-        <option value="Mayo">Mayo</option>
-        <option value="Junio">Junio</option>
-        <option value="Julio">Julio</option>
-        <option value="Agosto">Agosto</option>
-        <option value="Septiembre">Septiembre</option>
-        <option value="Octubre">Octubre</option>
-        <option value="Noviembre">Noviembre</option>
-        <option value="Diciembre">Diciembre</option>
-    </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="inputFecha">
+            </div>
+            <div class="form-group">
+                <label>Categoría</label>
+                <select id="inputCat">
+                    <option value="Supermercado">🛒 Súper</option>
+                    <option value="Combustible">⛽ Combustible</option>
+                    <option value="Salud">💊 Salud</option>
+                    <option value="Diario">📅 Diario</option>
+                    <option value="Servicios">💡 Servicios</option>
+                    <option value="Otros">✨ Otros</option>
+                </select>
+            </div>
+        </div>
 
-    <label>Categoría</label>
-    <select id="categoria">
-        <option value="Supermercado">🛒 Supermercado</option>
-        <option value="Combustible">⛽ Combustible</option>
-        <option value="Salud">💊 Salud / Farmacia</option>
-        <option value="Diario">📅 Gasto Diario</option>
-        <option value="Servicios">💡 Servicios Públicos</option>
-        <option value="Otros">✨ Otros</option>
-    </select>
+        <div class="form-group">
+            <label>Comercio y Detalle</label>
+            <input type="text" id="inputComercio" placeholder="Ej: Walmart - Carne y verduras">
+        </div>
 
-    <label>Comercio / Lugar</label>
-    <input type="text" id="comercio" placeholder="Ej: Walmart, Gasolinera, etc.">
+        <div class="form-group">
+            <label>Monto (₡)</label>
+            <input type="number" id="inputMonto" placeholder="0.00">
+        </div>
 
-    <label>Descripción</label>
-    <input type="text" id="descripcion" placeholder="¿Qué se compró?">
+        <button id="btnGuardar" class="btn-main">Guardar Gasto</button>
+        <button id="btnExcel" class="btn-secondary">Exportar Mes a Excel 📊</button>
+    </div>
 
-    <label>Monto (₡)</label>
-    <input type="number" id="monto" placeholder="Ej: 25000">
-
-    <button id="btnGuardar">Guardar Gasto</button>
-    <div id="msg" class="success-msg">✅ ¡Gasto guardado con éxito!</div>
+    <div class="history-section">
+        <h3>Movimientos del Mes</h3>
+        <div id="listaContenedor"></div>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Tu configuración real de Firebase
+    // Configuración desde tu captura de pantalla
     const firebaseConfig = {
         apiKey: "AIzaSyCq1uBRlyOeez3sbwZrpngvXVAEg8lb2hw",
         authDomain: "gomez-finance-94b2c.firebaseapp.com",
@@ -129,52 +181,108 @@
         appId: "1:23675517740:web:6d2b44cd72b04fba29ca89"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // Setup inicial
+    document.getElementById('inputFecha').valueAsDate = new Date();
+    let currentUnsubscribe = null;
+    let datosMesActual = [];
 
-    // Poner la fecha de hoy por defecto
-    document.getElementById('fecha').valueAsDate = new Date();
+    // --- FUNCIÓN NÚCLEO: CARGA Y FILTRADO ---
+    function sincronizarDatos(mes) {
+        if (currentUnsubscribe) currentUnsubscribe();
+        document.getElementById("labelMes").innerText = `Gastos de ${mes}`;
+        
+        const q = query(
+            collection(db, "gastos"), 
+            where("mes", "==", mes), 
+            orderBy("timestamp", "desc")
+        );
 
-    // Función para guardar
-    document.getElementById("btnGuardar").addEventListener("click", async () => {
-        const fecha = document.getElementById("fecha").value;
-        const mes = document.getElementById("mes").value;
-        const cat = document.getElementById("categoria").value;
-        const com = document.getElementById("comercio").value;
-        const desc = document.getElementById("descripcion").value;
-        const mon = document.getElementById("monto").value;
+        currentUnsubscribe = onSnapshot(q, (snapshot) => {
+            const contenedor = document.getElementById("listaContenedor");
+            let suma = 0;
+            contenedor.innerHTML = "";
+            datosMesActual = [];
 
-        if (fecha && desc && mon) {
-            try {
-                await addDoc(collection(db, "gastos"), {
-                    fecha: fecha,
-                    mes: mes,
-                    categoria: cat,
-                    comercio: com,
-                    descripcion: desc,
-                    monto: Number(mon),
-                    timestamp: new Date()
+            snapshot.forEach((doc) => {
+                const d = doc.data();
+                suma += d.monto;
+                
+                // Formato para Excel
+                datosMesActual.push({
+                    Fecha: d.fecha,
+                    Año: d.fecha.split('-')[0],
+                    Mes: d.mes,
+                    Categoria: d.categoria,
+                    Comercio_Detalle: d.comercio,
+                    Monto: d.monto
                 });
-                
-                // Mostrar mensaje de éxito
-                const msgDiv = document.getElementById("msg");
-                msgDiv.style.display = "block";
-                
-                // Limpiar campos de texto
-                document.getElementById("comercio").value = "";
-                document.getElementById("descripcion").value = "";
-                document.getElementById("monto").value = "";
-                
-                setTimeout(() => { msgDiv.style.display = "none"; }, 3000);
-            } catch (e) {
-                alert("Error al conectar con Firebase: " + e.message);
-            }
-        } else {
-            alert("Por favor completa la fecha, descripción y monto.");
+
+                // Formato para Móvil (Tarjetas)
+                contenedor.innerHTML += `
+                    <div class="item-gasto">
+                        <div class="item-details">
+                            <b>${d.comercio}</b>
+                            <span>${d.fecha.split('-').reverse().join('/')} • ${d.categoria}</span>
+                        </div>
+                        <div class="item-price">₡${d.monto.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+            document.getElementById("totalDisplay").innerText = `₡${suma.toLocaleString()}`;
+        }, (error) => {
+            console.error("Error en tiempo real:", error);
+        });
+    }
+
+    // --- GUARDADO SEGURO ---
+    document.getElementById("btnGuardar").addEventListener("click", async () => {
+        const monto = document.getElementById("inputMonto").value;
+        const comercio = document.getElementById("inputComercio").value;
+        const mes = document.getElementById("selectMes").value;
+
+        if (!monto || !comercio) {
+            alert("Por favor completa el monto y el detalle.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "gastos"), {
+                fecha: document.getElementById("inputFecha").value,
+                mes: mes,
+                categoria: document.getElementById("inputCat").value,
+                comercio: comercio,
+                monto: Number(monto),
+                timestamp: new Date()
+            });
+            
+            // Limpiar campos y feedback
+            document.getElementById("inputComercio").value = "";
+            document.getElementById("inputMonto").value = "";
+            console.log("Guardado correctamente");
+        } catch (e) {
+            alert("Error al guardar: " + e.message);
         }
     });
-</script>
 
+    // --- CAMBIO DE MES ---
+    document.getElementById("selectMes").addEventListener("change", (e) => {
+        sincronizarDatos(e.target.value);
+    });
+
+    // --- EXPORTACIÓN EXCEL ---
+    document.getElementById("btnExcel").addEventListener("click", () => {
+        if(datosMesActual.length === 0) return alert("No hay datos para exportar en este mes.");
+        const ws = XLSX.utils.json_to_sheet(datosMesActual);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Gastos");
+        XLSX.writeFile(wb, `Gomez_Finance_${document.getElementById("selectMes").value}.xlsx`);
+    });
+
+    // Iniciar con mes actual
+    sincronizarDatos("Abril");
+</script>
 </body>
 </html>
