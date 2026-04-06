@@ -73,8 +73,8 @@
 </div>
 
 <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('gastos')">Registro</button>
-    <button class="nav-tab" onclick="switchTab('historial')">Historial</button>
+    <button class="nav-tab active" onclick="switchTab('gastos')">Registro de Gastos</button>
+    <button class="nav-tab" onclick="switchTab('historial')">Historial de Gastos</button>
     <button class="nav-tab" onclick="switchTab('presupuesto')">Ajustes</button>
     <button class="nav-tab" onclick="switchTab('resumen')">Resumen</button>
 </nav>
@@ -83,13 +83,19 @@
     
     <div id="view-gastos" class="view active">
         <div class="card">
-            <div class="card-title">📝 Nuevo Gasto</div>
-            <input type="hidden" id="editId">
+            
             
             <div class="form-group" style="margin-bottom: 15px;">
-                <label>Mes de Control (Selecciona uno o más)</label>
+                <label>Mes de Control (Selecciona uno o más para filtrar)</label>
+                <hr>
+                <br>
                 <div class="chips-container" id="mesesRegistro"></div>
             </div>
+         <br>
+
+         <div class="card-title">📝 Registro de Nuevo Gasto</div>
+            <input type="hidden" id="editId">
+            
 
             <div class="form-grid">
                 <div class="form-group"><label>Fecha</label><input type="date" id="fecha"></div>
@@ -102,7 +108,7 @@
             </div>
             
             <div class="btn-row">
-                <button id="btnGuardar" class="btn btn-primary">💾 Guardar Movimiento</button>
+                <button id="btnGuardar" class="btn btn-primary">💾 Guardar Gasto</button>
                 <button id="btnActualizar" class="btn btn-success" style="display:none;">🔄 Actualizar</button>
                 <button id="btnCancelar" class="btn btn-ghost" style="display:none;" onclick="limpiar()">Cancelar</button>
             </div>
@@ -274,7 +280,7 @@
             .filter(g => mesesRegistroSeleccionados.includes(g.mes))
             .reduce((acc, c) => acc + c.monto, 0);
         
-        const etiqueta = mesesRegistroSeleccionados.length > 1 ? "Acumulado Multimes" : `Acumulado ${mesesRegistroSeleccionados[0] || ''}`;
+        const etiqueta = mesesRegistroSeleccionados.length > 1 ? "Acumulado por Meses seleccionados" : `Acumulado ${mesesRegistroSeleccionados[0] || ''}`;
         document.getElementById("txtSumaMes").innerText = etiqueta;
         document.getElementById("sumaRegistro").innerText = "₡" + total.toLocaleString();
         window.currentTotalSum = total;
