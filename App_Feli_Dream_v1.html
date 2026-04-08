@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BabyDream Pro - Análisis Avanzado</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --night: #312e81; --bg: #f8fafc; --card: #ffffff; 
+            --ink: #0f172a; --muted: #64748b; --border: #e2e8f0; --success: #10b981;
+            --radius: 20px; --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
+
+        .header { background: var(--ink); padding: 20px; color: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .nav-tabs { display: flex; gap: 8px; background: #fff; padding: 8px; margin: 15px; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .nav-tab { flex: 1; padding: 12px; border: none; border-radius: 14px; background: transparent; font-weight: 700; color: var(--muted); cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
+        .nav-tab.active { background: var(--ink); color: #fff; }
+
+        .container { padding: 0 15px 120px; max-width: 900px; margin: 0 auto; }
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--card); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .card-title { font-size: 13px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; }
+        
+        /* Dashboard de Análisis */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: #f1f5f9; padding: 16px; border-radius: 16px; text-align: center; }
+        .stat-val { font-size: 20px; font-weight: 800; color: var(--ink); display: block; }
+        .stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+        .diurno { border-bottom: 4px solid var(--primary); }
+        .nocturno { border-bottom: 4px solid var(--night); }
+
+        /* Formulario */
+        .form-group { margin-bottom: 15px; }
+        label { font-size: 11px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; }
+        .time-picker { display: flex; gap: 6px; }
+        select, input { padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; background: #fff; flex: 1; transition: border-color 0.2s; }
+        select:focus, input:focus { border-color: var(--primary); }
+
+        .btn { padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-outline { background: #f1f5f9; color: var(--muted); margin-top: 10px; }
+
+        .status-msg { padding: 15px; border-radius: 14px; background: #eef2ff; color: #4338ca; font-size: 13px; font-weight: 600; margin-bottom: 20px; border: 1px solid #c7d2fe; text-align: center; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        td { padding: 16px 10px; border-top: 1px solid var(--border); }
+        .badge { padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bg-siesta { background: #e0e7ff; color: #4338ca; }
+        .bg-noche { background: #dbeafe; color: #1e3a8a; }
+
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 1000; backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">FeliDream 🌙</div>
+    <div id="reloj" style="font-family: 'DM Mono'; font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px;"></div>
+</div>
+
+<nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('registro')">Registro</button>
+    <button class="nav-tab" onclick="switchTab('historial')">Bitácora</button>
+    <button class="nav-tab" onclick="switchTab('analitica')">Análisis</button>
+</nav>
+
+<div class="container">
+    <div id="view-registro" class="view active">
+        <div class="card">
+            <div class="card-title">📝 Ingresar Nuevo Registro de Sueño</div>
+            <div id="panel-inicio">
+                <div class="form-group">
+                    <label>Tipo de sueño</label>
+                    <select id="reg_tipo">
+                        <option value="Siesta">🌤️ Siesta Diurna</option>
+                        <option value="Nocturno">🌙 Sueño Nocturno</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Inicio</label>
+                    <input type="date" id="reg_f_ini">
+                </div>
+                <div class="form-group">
+                    <label>Hora de Inicio (12h)</label>
+                    <div class="time-picker" id="tp_ini"></div>
+                </div>
+                <button onclick="registrarInicio()" class="btn btn-primary">Empezar a contar</button>
+            </div>
+
+            <div id="panel-fin" style="display:none;">
+                <div id="msg-activo" class="status-msg"></div>
+                <div class="form-group">
+                    <label>Fecha de Fin</label>
+                    <input type="date" id="reg_f_fin">
+                </div>
+                <div class="form-group">
+                    <label>Hora de Fin (12h)</label>
+                    <div class="time-picker" id="tp_fin"></div>
+                </div>
+                <button onclick="registrarFin()" class="btn btn-success">Finalizar y Guardar</button>
+                <button onclick="cancelarActivo()" class="btn btn-outline">Descartar registro</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-historial" class="view">
+        <div class="card">
+            <div class="card-title">📋 Últimos Registros</div>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr style="text-align: left; font-size: 10px; color: var(--muted);">
+                            <th>FECHA / HORA</th>
+                            <th>TIPO</th>
+                            <th>DURACIÓN</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaHistorial"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-analitica" class="view">
+        <div class="card">
+            <div class="card-title">📊 Resumen de Descanso</div>
+            
+            <div class="stats-grid">
+                <div class="stat-box diurno">
+                    <span class="stat-label">Diario (Hoy)</span>
+                    <span id="stat_hoy" class="stat-val">0h 0m</span>
+                </div>
+                <div class="stat-box nocturno">
+                    <span class="stat-label">Prom. Semanal</span>
+                    <span id="stat_sem_avg" class="stat-val">0h 0m</span>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box" style="background: #eef2ff;">
+                    <span class="stat-label">Total Siestas (Mes)</span>
+                    <span id="stat_mes_siesta" class="stat-val" style="color: var(--primary);">0h</span>
+                </div>
+                <div class="stat-box" style="background: #e0e7ff;">
+                    <span class="stat-label">Total Noche (Mes)</span>
+                    <span id="stat_mes_noche" class="stat-val" style="color: var(--night);">0h</span>
+                </div>
+            </div>
+
+            <div style="height:250px; margin-top: 20px;"><canvas id="graficoSueno"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div id="modalEdit" class="modal">
+    <div class="card" style="width:100%; max-width:400px;">
+        <div class="card-title">✏️ Editar Registro</div>
+        <input type="hidden" id="edit_id">
+        <div class="form-group"><label>Fecha Inicio</label><input type="date" id="edit_f_ini"></div>
+        <div class="form-group"><label>Fecha Fin</label><input type="date" id="edit_f_fin"></div>
+        <p style="font-size: 11px; color: var(--muted); margin-bottom: 15px;">*Nota: La duración se recalculará según las fechas.</p>
+        <div style="display:flex; gap:10px">
+            <button onclick="guardarEdicion()" class="btn btn-success" style="padding:10px">Guardar</button>
+            <button onclick="cerrarModal()" class="btn btn-outline" style="margin:0; padding:10px">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCq1uBRlyOeez3sbwZrpngvXVAEg8lb2hw",
+        authDomain: "gomez-finance-94b2c.firebaseapp.com",
+        projectId: "gomez-finance-94b2c",
+        storageBucket: "gomez-finance-94b2c.firebasestorage.app",
+        messagingSenderId: "23675517740",
+        appId: "1:23675517740:web:6d2b44cd72b04fba29ca89"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const colRef = collection(db, "sueno_bebe");
+    let sesiones = [];
+    let activa = null;
+    let chartInstance = null;
+
+    // --- HELPERS TIEMPO ---
+    const crearTimePickers = (id) => {
+        const h = Array.from({length: 12}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+        const m = Array.from({length: 60}, (_, i) => `<option value="${i.toString().padStart(2,'0')}">${i.toString().padStart(2,'0')}</option>`).join('');
+        document.getElementById(id).innerHTML = `
+            <select id="${id}_h">${h}</select>
+            <select id="${id}_m">${m}</select>
+            <select id="${id}_p"><option>AM</option><option>PM</option></select>
+        `;
+    };
+
+    const getH24 = (id) => {
+        let h = parseInt(document.getElementById(`${id}_h`).value);
+        let m = document.getElementById(`${id}_m`).value;
+        let p = document.getElementById(`${id}_p`).value;
+        if(p === 'PM' && h < 12) h += 12;
+        if(p === 'AM' && h === 12) h = 0;
+        return `${h.toString().padStart(2,'0')}:${m}`;
+    };
+
+    const fmt12 = (t24) => {
+        if(!t24) return "";
+        let [h, m] = t24.split(':');
+        let p = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${m} ${p}`;
+    };
+
+    const fmtDur = (hrs) => {
+        const h = Math.floor(hrs);
+        const m = Math.round((hrs - h) * 60);
+        return `${h}h ${m}m`;
+    };
+
+    // --- FIREBASE SYNC ---
+    onSnapshot(query(colRef, orderBy("timestamp", "desc")), (snap) => {
+        sesiones = []; activa = null;
+        snap.forEach(d => {
+            const data = { id: d.id, ...d.data() };
+            sesiones.push(data);
+            if(data.estado === 'abierto') activa = data;
+        });
+        actualizarTodo();
+    });
+
+    function actualizarTodo() {
+        const pIni = document.getElementById('panel-inicio');
+        const pFin = document.getElementById('panel-fin');
+        if(activa) {
+            pIni.style.display = "none"; pFin.style.display = "block";
+            document.getElementById('msg-activo').innerText = `Registrando ${activa.tipo} desde las ${fmt12(activa.h_inicio)}`;
+            document.getElementById('reg_f_fin').value = new Date().toISOString().split('T')[0];
+        } else {
+            pIni.style.display = "block"; pFin.style.display = "none";
+            document.getElementById('reg_f_ini').value = new Date().toISOString().split('T')[0];
+        }
+        renderHistorial();
+        calcularStats();
+    }
+
+    // --- ACCIONES ---
+    window.registrarInicio = async () => {
+        const t = document.getElementById('reg_tipo').value;
+        const f = document.getElementById('reg_f_ini').value;
+        const h = getH24('tp_ini');
+        await addDoc(colRef, { tipo: t, f_inicio: f, h_inicio: h, f_fin: '', h_fin: '', duracion: 0, estado: 'abierto', timestamp: new Date() });
+    };
+
+    window.registrarFin = async () => {
+        const f2 = document.getElementById('reg_f_fin').value;
+        const h2 = getH24('tp_fin');
+        const d1 = new Date(`${activa.f_inicio}T${activa.h_inicio}`);
+        const d2 = new Date(`${f2}T${h2}`);
+        const diff = (d2 - d1) / 3600000;
+        if(diff <= 0) return alert("La hora final debe ser posterior.");
+        await updateDoc(doc(db, "sueno_bebe", activa.id), { f_fin: f2, h_fin: h2, duracion: diff, estado: 'cerrado' });
+        alert("Ciclo guardado con éxito.");
+    };
+
+    window.cancelarActivo = async () => { if(confirm("¿Borrar registro actual?")) await deleteDoc(doc(db, "sueno_bebe", activa.id)); };
+
+    // --- CÁLCULOS Y DASHBOARD ---
+    function calcularStats() {
+        const hoy = new Date().toISOString().split('T')[0];
+        const mesActual = new Date().getMonth();
+        
+        // Hoy
+        const totHoy = sesiones.filter(s => s.f_fin === hoy).reduce((a,b)=>a+b.duracion, 0);
+        document.getElementById('stat_hoy').innerText = fmtDur(totHoy);
+
+        // Semanal
+        const ult7 = sesiones.filter(s => (new Date() - new Date(s.f_fin)) / (1000*3600*24) <= 7);
+        const avgSem = ult7.reduce((a,b)=>a+b.duracion,0) / 7;
+        document.getElementById('stat_sem_avg').innerText = fmtDur(avgSem || 0);
+
+        // Mes Desglosado
+        const mesData = sesiones.filter(s => new Date(s.f_fin).getMonth() === mesActual);
+        const mesSiesta = mesData.filter(s=>s.tipo==='Siesta').reduce((a,b)=>a+b.duracion,0);
+        const mesNoche = mesData.filter(s=>s.tipo==='Nocturno').reduce((a,b)=>a+b.duracion,0);
+        
+        document.getElementById('stat_mes_siesta').innerText = Math.floor(mesSiesta) + "h";
+        document.getElementById('stat_mes_noche').innerText = Math.floor(mesNoche) + "h";
+
+        if(document.getElementById('view-analitica').classList.contains('active')) renderChart();
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('graficoSueno').getContext('2d');
+        const dias = [...Array(7)].map((_,i)=>{
+            const d = new Date(); d.setDate(d.getDate()-i);
+            return d.toISOString().split('T')[0];
+        }).reverse();
+
+        const dataS = dias.map(d => sesiones.filter(s=>s.f_fin===d && s.tipo==='Siesta').reduce((a,b)=>a+b.duracion,0));
+        const dataN = dias.map(d => sesiones.filter(s=>s.f_fin===d && s.tipo==='Nocturno').reduce((a,b)=>a+b.duracion,0));
+
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dias.map(d => d.slice(8)+"/"+d.slice(5,7)),
+                datasets: [
+                    { label: 'Noche 🌙', data: dataN, backgroundColor: '#312e81', borderRadius: 6 },
+                    { label: 'Siestas 🌤️', data: dataS, backgroundColor: '#6366f1', borderRadius: 6 }
+                ]
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { weight: 'bold' } } } },
+                scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+            }
+        });
+    }
+
+    // --- BITÁCORA & EDICIÓN ---
+    function renderHistorial() {
+        const tbody = document.getElementById('listaHistorial');
+        tbody.innerHTML = "";
+        sesiones.forEach(s => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><span style="font-weight:700">${s.f_inicio.slice(5)}</span><br><small style="color:var(--muted)">${fmt12(s.h_inicio)}</small></td>
+                    <td><span class="badge ${s.tipo==='Siesta'?'bg-siesta':'bg-noche'}">${s.tipo}</span></td>
+                    <td><b>${s.estado==='abierto' ? '...' : fmtDur(s.duracion)}</b></td>
+                    <td>
+                        <button onclick="abrirEdicion('${s.id}')" style="border:none; background:none; cursor:pointer">✏️</button>
+                        <button onclick="eliminar('${s.id}')" style="border:none; background:none; cursor:pointer; margin-left:10px">🗑️</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    window.abrirEdicion = (id) => {
+        const s = sesiones.find(x => x.id === id);
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_f_ini').value = s.f_inicio;
+        document.getElementById('edit_f_fin').value = s.f_fin;
+        document.getElementById('modalEdit').style.display = "flex";
+    };
+
+    window.guardarEdicion = async () => {
+        const id = document.getElementById('edit_id').value;
+        const s = sesiones.find(x => x.id === id);
+        const f1 = document.getElementById('edit_f_ini').value;
+        const f2 = document.getElementById('edit_f_fin').value;
+        const d = (new Date(`${f2}T${s.h_fin}`) - new Date(`${f1}T${s.h_inicio}`)) / 3600000;
+        await updateDoc(doc(db, "sueno_bebe", id), { f_inicio: f1, f_fin: f2, duracion: d > 0 ? d : s.duracion });
+        cerrarModal();
+    };
+
+    window.cerrarModal = () => document.getElementById('modalEdit').style.display = "none";
+    window.eliminar = async (id) => { if(confirm("¿Eliminar para siempre?")) await deleteDoc(doc(db, "sueno_bebe", id)); };
+
+    window.switchTab = (t) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-'+t).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(t === 'analitica') setTimeout(calcularStats, 100);
+    };
+
+    crearTimePickers('tp_ini'); crearTimePickers('tp_fin');
+    setInterval(() => { 
+        document.getElementById('reloj').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}); 
+    }, 1000);
+</script>
+</body>
+</html>
