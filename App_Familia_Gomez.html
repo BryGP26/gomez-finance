@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gómez Finance - Dashboard Pro</title>
+    <title>Gómez Finance - Master Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2563eb; --bg: #f5f6fb; --card: #ffffff; --ink: #0f1117;
@@ -20,49 +21,40 @@
         .header-logo { font-size: 20px; font-weight: 700; }
         .header-logo span { color: #60a5fa; }
 
-        .nav-tabs { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius); padding: 6px; margin: 20px auto; max-width: 860px; box-shadow: var(--shadow); width: calc(100% - 32px); }
+        .nav-tabs { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius); padding: 6px; margin: 20px auto; max-width: 900px; box-shadow: var(--shadow); width: calc(100% - 32px); }
         .nav-tab { flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s; text-align: center; font-size: 11px; text-transform: uppercase; }
         .nav-tab.active { background: var(--ink); color: #fff; }
 
-        .container { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+        .container { max-width: 950px; margin: 0 auto; padding: 0 16px; }
         .view { display: none; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 16px; }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; background: #fff; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
 
-        .filter-label { font-size: 11px; font-weight: 700; color: var(--muted); margin: 15px 0 8px 0; display: block; text-transform: uppercase; }
-        .chips-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .chip { padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; background: #fff; transition: all 0.2s ease; user-select: none; }
-        .chip.active { background: var(--ink); color: white; border-color: var(--ink); }
-        .chip-all.active { background: var(--success); border-color: var(--success); }
+        .check-group { display: flex; flex-wrap: wrap; gap: 8px; background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid var(--border); max-height: 120px; overflow-y: auto; width: 100%; }
+        .check-item { display: flex; align-items: center; gap: 6px; background: white; padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; user-select: none; }
+        .check-item.active { border-color: var(--primary); background: #eff6ff; }
 
-        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-success { background: var(--success); color: #fff; }
-        .btn-ghost { background: var(--bg); color: var(--ink); border: 1px solid var(--border); }
+        .btn { padding: 12px 20px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+        .btn-ghost { background: #f1f5f9; color: var(--ink); border: 1px solid var(--border); }
+        .btn-small { padding: 4px 8px; font-size: 9px; text-transform: uppercase; background: var(--ink); color: white; border-radius: 4px; cursor: pointer; border: none; }
 
         .live-sum-card { background: var(--ink); color: white; border-radius: var(--radius); padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .live-sum-card div { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 700; color: #60a5fa; }
+        .live-sum-card div { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 700; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; padding: 14px; color: var(--muted); border-bottom: 2px solid var(--border); font-size: 11px; }
-        td { padding: 14px; border-bottom: 1px solid var(--border); }
-        .monto-col { font-family: 'DM Mono', monospace; font-weight: bold; text-align: right; }
-        .total-row { background: #f8fafc; font-weight: 700; }
-        .btn-icon { border: none; background: #f1f5f9; cursor: pointer; padding: 8px; border-radius: 8px; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        th { text-align: left; padding: 12px; color: var(--muted); border-bottom: 2px solid var(--border); font-size: 11px; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        
+        .chart-box { height: 300px; margin-top: 20px; margin-bottom: 40px; }
     </style>
 </head>
 <body>
@@ -73,105 +65,99 @@
 </div>
 
 <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('gastos')">Registro de Gastos</button>
-    <button class="nav-tab" onclick="switchTab('historial')">Historial de Gastos</button>
-    <button class="nav-tab" onclick="switchTab('presupuesto')">Ajustes</button>
-    <button class="nav-tab" onclick="switchTab('resumen')">Resumen</button>
+    <button class="nav-tab active" onclick="switchTab('gastos')">Registro</button>
+    <button class="nav-tab" onclick="switchTab('historial')">Historial</button>
+    <button class="nav-tab" onclick="switchTab('resumen')">Analítica</button>
 </nav>
 
 <div class="container">
     
     <div id="view-gastos" class="view active">
         <div class="card">
-            
-            
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label>Mes de Control (Selecciona uno o más para filtrar)</label>
-                <hr>
-                <br>
-                <div class="chips-container" id="mesesRegistro"></div>
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label>Filtrar Suma de Meses</label>
+                    <button class="btn-small" onclick="toggleTodos('registro')">Seleccionar Todos</button>
+                </div>
+                <div class="check-group" id="checksRegistro"></div>
             </div>
-         <br>
-
-         <div class="card-title">📝 Registro de Nuevo Gasto</div>
-            <input type="hidden" id="editId">
             
-
+            <div class="card-title" style="margin-top: 20px;">📝 Registrar Gasto</div>
             <div class="form-grid">
                 <div class="form-group"><label>Fecha</label><input type="date" id="fecha"></div>
-                <div class="form-group">
-                    <label>Categoría</label>
-                    <select id="categoria"></select>
-                </div>
-                <div class="form-group"><label>Comercio / Detalle</label><input type="text" id="comercio" placeholder="Ej: Supermercado"></div>
+                <div class="form-group"><label>Categoría</label><select id="categoria"></select></div>
+                <div class="form-group"><label>Detalle</label><input type="text" id="comercio" placeholder="Ej: Supermercado"></div>
                 <div class="form-group"><label>Monto (₡)</label><input type="number" id="monto" placeholder="0"></div>
             </div>
             
-            <div class="btn-row">
-                <button id="btnGuardar" class="btn btn-primary">💾 Guardar Gasto</button>
-                <button id="btnActualizar" class="btn btn-success" style="display:none;">🔄 Actualizar</button>
+            <div style="margin-top: 15px; display: flex; gap: 8px;">
+                <button id="btnGuardar" class="btn btn-primary">💾 Guardar Registro</button>
+                <button id="btnActualizar" class="btn" style="display:none; background:var(--success); color:white;">🔄 Actualizar</button>
                 <button id="btnCancelar" class="btn btn-ghost" style="display:none;" onclick="limpiar()">Cancelar</button>
             </div>
 
             <div class="live-sum-card">
-                <div><small id="txtSumaMes">Acumulado Seleccionado</small><div id="sumaRegistro">₡0</div></div>
-                <span style="font-size: 24px;">📈</span>
+                <div><small>Total Seleccionado</small><div id="sumaRegistro">₡0</div></div>
+                <div style="text-align: right;"><small>Balance Proyectado</small><div id="balanceRegistro">₡0</div></div>
             </div>
         </div>
     </div>
 
     <div id="view-historial" class="view">
         <div class="card">
-            <div class="card-title">🔍 Filtros de Consulta</div>
-            <span class="filter-label">Por Meses</span>
-            <div class="chips-container" id="filtrosMeses"></div>
-            <span class="filter-label">Por Categorías</span>
-            <div class="chips-container" id="filtrosCategorias"></div>
-
-            <div style="overflow-x: auto; margin-top: 10px;">
+            <div class="card-title">
+                📋 Historial de Movimientos
+                <button class="btn-small" onclick="toggleTodos('historial')">Todos los Meses</button>
+            </div>
+            <div class="form-grid" style="margin-bottom: 15px;">
+                <div class="form-group">
+                    <label>Meses</label>
+                    <div class="check-group" id="checksHistorial"></div>
+                </div>
+                <div class="form-group">
+                    <label>Ajustes de búsqueda</label>
+                    <div style="display: flex; gap: 5px;">
+                        <select id="filtroAnio" onchange="renderizarTablaHistorial()">
+                            <option value="2025">2025</option><option value="2026" selected>2026</option>
+                        </select>
+                        <select id="filtroCategoria" onchange="renderizarTablaHistorial()"><option value="">Todas</option></select>
+                    </div>
+                    <input type="text" id="filtroBusqueda" placeholder="🔍 Buscar comercio..." oninput="renderizarTablaHistorial()" style="margin-top:8px">
+                </div>
+            </div>
+            <div style="overflow-x:auto">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Categoría</th>
-                            <th style="text-align:right">Monto</th>
-                            <th style="text-align:center">Acción</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Fecha</th><th>Detalle</th><th style="text-align:right">Monto</th><th style="text-align:center">Acción</th></tr></thead>
                     <tbody id="cuerpoTabla"></tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td colspan="2">TOTAL FILTRADO</td>
-                            <td id="totalHistorial" class="monto-col" style="color:var(--primary)">₡0</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
                 </table>
+            </div>
+            <div class="live-sum-card" style="margin-top: 20px; background: var(--bg); color: var(--ink); border: 1px solid var(--border);">
+                <div style="color: var(--primary);"><small>Suma de Filtros</small><div id="totalHistorial">₡0</div></div>
             </div>
         </div>
     </div>
 
-    <div id="view-presupuesto" class="view">
-        <div class="card">
-            <div class="card-title">⚙️ Configuración</div>
-            <label>Presupuesto Mensual (₡)</label>
-            <input type="number" id="inputPresupuesto" value="0" onchange="calcStats()">
-        </div>
-    </div>
-
     <div id="view-resumen" class="view">
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Límite</div><div class="stat-value" id="valPres">₡0</div></div>
-            <div class="stat-card"><div class="stat-label">Gastado</div><div class="stat-value" id="valGasto" style="color:var(--danger)">₡0</div></div>
-            <div class="stat-card"><div class="stat-label">Libre</div><div class="stat-value" id="valLibre" style="color:var(--success)">₡0</div></div>
+        <div class="card">
+             <div class="card-title">💰 Presupuesto Quincenal (Fijo por Mes)</div>
+             <div class="form-grid">
+                <div class="form-group"><label>Día 15</label><input type="number" id="pres15" oninput="guardarPresupuesto()"></div>
+                <div class="form-group"><label>Día 30</label><input type="number" id="pres30" oninput="guardarPresupuesto()"></div>
+             </div>
+             <div id="statusP" style="margin-top: 10px; font-size: 12px; color: var(--success);">✔ Se guarda automáticamente</div>
         </div>
-        <button class="btn btn-success" id="btnExportar" style="width: 100%;">📥 Exportar Excel</button>
+
+        <div class="card">
+            <div class="card-title">📊 Visualización de Consumos (2026)</div>
+            <div class="chart-box"><canvas id="chartLineal"></canvas></div>
+            <div class="chart-box"><canvas id="chartBarras"></canvas></div>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCq1uBRlyOeez3sbwZrpngvXVAEg8lb2hw",
@@ -185,86 +171,57 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const colRef = collection(db, "gastos");
-
     let todosLosGastos = [];
-    
-    // ESTADO DE SELECCIÓN
-    let mesesRegistroSeleccionados = ["Abril"]; // Mes por defecto
-    let filtrosSeleccionados = { meses: ["Abril"], cats: [] };
+    let chartL = null, chartB = null;
+    const CLAVE = "212630$";
 
     const listaMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    const listaCats = [
-        "🛒 Supermercado", "⛽ Combustible", "💊 Salud y Medicina", 
-        "🍔 Restaurantes", "💡 Electricidad", "💧 Agua", 
-        "🏠 Alquiler/Casa", "🚌 Transporte", "💄 Belleza", 
-        "🎭 Recreación", "🏊 Natación", "📺 Cable e Internet", "🐾 Mascotas", "✨ Otros"
-    ];
+    const listaCats = ["🛒 Supermercado", "⛽ Combustible", "💊 Salud", "🍔 Restaurantes", "💡 Servicios", "🏠 Vivienda", "🚌 Transporte", "🎭 Recreación", "🐾 Mascotas", "✨ Otros"];
 
-    // CARGAR SELECT CATEGORÍA
-    const selectCat = document.getElementById("categoria");
-    listaCats.forEach(cat => {
-        let opt = document.createElement("option");
-        opt.value = cat; opt.innerText = cat;
-        selectCat.appendChild(opt);
+    let mesesReg = [listaMeses[new Date().getMonth()]];
+    let mesesHist = [listaMeses[new Date().getMonth()]];
+
+    // Cargar Cats
+    const selCat = document.getElementById("categoria");
+    const filCat = document.getElementById("filtroCategoria");
+    listaCats.forEach(c => {
+        selCat.innerHTML += `<option value="${c}">${c}</option>`;
+        filCat.innerHTML += `<option value="${c}">${c}</option>`;
     });
 
-    // LÓGICA DE CHIPS GENÉRICA
-    function renderizarChips(lista, contenedorId, arrayEstado, esRegistro = false) {
+    function renderizarChecks(contenedorId, listaSeleccionada, callback) {
         const cont = document.getElementById(contenedorId);
         cont.innerHTML = "";
-        
-        // Botón Todos
-        const chipAll = document.createElement("div");
-        chipAll.className = `chip chip-all ${arrayEstado.length === lista.length ? 'active' : ''}`;
-        chipAll.innerText = "🌟 Todos";
-        chipAll.onclick = () => {
-            if (arrayEstado.length === lista.length) arrayEstado.length = 0;
-            else { arrayEstado.length = 0; arrayEstado.push(...lista); }
-            actualizarInterfazChips(contenedorId, lista, arrayEstado);
-            if(esRegistro) actualizarSumaRegistro(); else renderizarTablaHistorial();
-        };
-        cont.appendChild(chipAll);
-
-        lista.forEach(item => {
-            const chip = document.createElement("div");
-            chip.className = `chip ${arrayEstado.includes(item) ? 'active' : ''}`;
-            chip.innerText = item;
-            chip.onclick = () => {
-                const idx = arrayEstado.indexOf(item);
-                if (idx > -1) arrayEstado.splice(idx, 1);
-                else arrayEstado.push(item);
-                actualizarInterfazChips(contenedorId, lista, arrayEstado);
-                if(esRegistro) actualizarSumaRegistro(); else renderizarTablaHistorial();
+        listaMeses.forEach(m => {
+            const item = document.createElement("label");
+            const active = listaSeleccionada.includes(m);
+            item.className = `check-item ${active ? 'active' : ''}`;
+            item.innerHTML = `<input type="checkbox" ${active ? 'checked' : ''} style="display:none"> ${m}`;
+            item.onclick = (e) => {
+                e.preventDefault();
+                if(listaSeleccionada.includes(m)) {
+                    const idx = listaSeleccionada.indexOf(m);
+                    listaSeleccionada.splice(idx, 1);
+                } else {
+                    listaSeleccionada.push(m);
+                }
+                callback();
+                renderizarChecks(contenedorId, listaSeleccionada, callback);
             };
-            cont.appendChild(chip);
+            cont.appendChild(item);
         });
     }
 
-    function actualizarInterfazChips(contenedorId, lista, arrayEstado) {
-        const cont = document.getElementById(contenedorId);
-        const chips = Array.from(cont.querySelectorAll(".chip"));
-        chips.forEach(c => {
-            if (c.innerText === "🌟 Todos") {
-                c.classList.toggle("active", arrayEstado.length === lista.length);
-            } else {
-                c.classList.toggle("active", arrayEstado.includes(c.innerText));
-            }
-        });
-    }
-
-    // INICIALIZACIÓN
-    renderizarChips(listaMeses, "mesesRegistro", mesesRegistroSeleccionados, true);
-    renderizarChips(listaMeses, "filtrosMeses", filtrosSeleccionados.meses);
-    renderizarChips(listaCats, "filtrosCategorias", filtrosSeleccionados.cats);
-
-    setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    document.getElementById('fecha').valueAsDate = new Date();
-
-    window.switchTab = (tabId) => {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('view-' + tabId).classList.add('active');
-        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    window.toggleTodos = (tipo) => {
+        if(tipo === 'registro') {
+            mesesReg = mesesReg.length === 12 ? [] : [...listaMeses];
+            renderizarChecks("checksRegistro", mesesReg, actualizarSumaRegistro);
+            actualizarSumaRegistro();
+        } else {
+            mesesHist = mesesHist.length === 12 ? [] : [...listaMeses];
+            renderizarChecks("checksHistorial", mesesHist, renderizarTablaHistorial);
+            renderizarTablaHistorial();
+        }
     };
 
     onSnapshot(query(colRef, orderBy("timestamp", "desc")), (snap) => {
@@ -272,55 +229,107 @@
         snap.forEach(d => todosLosGastos.push({ id: d.id, ...d.data() }));
         actualizarSumaRegistro();
         renderizarTablaHistorial();
+        if(chartL) actualizarGraficos();
     });
 
-    // SUMA DINÁMICA DEL REGISTRO (Basada en chips seleccionados)
-    window.actualizarSumaRegistro = () => {
-        const total = todosLosGastos
-            .filter(g => mesesRegistroSeleccionados.includes(g.mes))
-            .reduce((acc, c) => acc + c.monto, 0);
-        
-        const etiqueta = mesesRegistroSeleccionados.length > 1 ? "Acumulado por Meses seleccionados" : `Acumulado ${mesesRegistroSeleccionados[0] || ''}`;
-        document.getElementById("txtSumaMes").innerText = etiqueta;
+    window.actualizarSumaRegistro = async () => {
+        const total = todosLosGastos.filter(g => mesesReg.includes(g.mes)).reduce((acc, c) => acc + c.monto, 0);
         document.getElementById("sumaRegistro").innerText = "₡" + total.toLocaleString();
-        window.currentTotalSum = total;
-        calcStats();
+        
+        // Balance
+        const mesActual = listaMeses[new Date().getMonth()];
+        const anioActual = new Date().getFullYear().toString();
+        const docSnap = await getDoc(doc(db, "presupuestos", `${anioActual}_${mesActual}`));
+        if(docSnap.exists()){
+            const p = docSnap.data();
+            const totalP = Number(p.q15 || 0) + Number(p.q30 || 0);
+            const bal = totalP - total;
+            document.getElementById("balanceRegistro").innerText = "₡" + bal.toLocaleString();
+            document.getElementById("balanceRegistro").style.color = bal < 0 ? "red" : "#60a5fa";
+        }
     };
 
     window.renderizarTablaHistorial = () => {
+        const fCat = document.getElementById("filtroCategoria").value;
+        const fAnio = document.getElementById("filtroAnio").value;
+        const fBus = document.getElementById("filtroBusqueda").value.toLowerCase();
         const tbody = document.getElementById("cuerpoTabla");
         tbody.innerHTML = "";
-        let sumaFiltrada = 0;
-
+        
         const filtrados = todosLosGastos.filter(g => {
-            const mesMatch = filtrosSeleccionados.meses.length === 0 || filtrosSeleccionados.meses.includes(g.mes);
-            const catMatch = filtrosSeleccionados.cats.length === 0 || filtrosSeleccionados.cats.includes(g.categoria);
-            return mesMatch && catMatch;
+            return mesesHist.includes(g.mes) && (fCat === "" || g.categoria === fCat) && g.fecha.includes(fAnio) && g.comercio.toLowerCase().includes(fBus);
         });
 
+        let suma = 0;
         filtrados.forEach(g => {
-            sumaFiltrada += g.monto;
-            const tr = document.createElement("tr");
-            const f = g.fecha.split('-').reverse().join('/');
-            tr.innerHTML = `
-                <td>${f}</td>
-                <td><b>${g.categoria}</b><br><small style="color:var(--muted)">${g.comercio}</small></td>
-                <td class="monto-col">₡${g.monto.toLocaleString()}</td>
-                <td style="text-align:center"><button class="btn-icon" onclick="prepararEdit('${g.id}')">✏️</button></td>
-            `;
-            tbody.appendChild(tr);
+            suma += g.monto;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${g.fecha.split('-').reverse().join('/')}</td>
+                    <td><b>${g.comercio}</b><br><small>${g.categoria}</small></td>
+                    <td style="text-align:right">₡${g.monto.toLocaleString()}</td>
+                    <td style="text-align:center">
+                        <button class="btn-small" onclick="prepararEdit('${g.id}')">✏️</button>
+                        <button class="btn-small" style="background:red" onclick="borrarRegistro('${g.id}')">🗑️</button>
+                    </td>
+                </tr>`;
         });
-        document.getElementById("totalHistorial").innerText = "₡" + sumaFiltrada.toLocaleString();
+        document.getElementById("totalHistorial").innerText = "₡" + suma.toLocaleString();
     };
+
+    window.borrarRegistro = async (id) => {
+        const p = prompt("Clave de seguridad:");
+        if(p === CLAVE) {
+            await deleteDoc(doc(db, "gastos", id));
+            alert("Eliminado.");
+        } else if(p !== null) alert("Clave incorrecta.");
+    };
+
+    window.guardarPresupuesto = async () => {
+        const mes = listaMeses[new Date().getMonth()];
+        const anio = new Date().getFullYear().toString();
+        const q15 = document.getElementById("pres15").value;
+        const q30 = document.getElementById("pres30").value;
+        await setDoc(doc(db, "presupuestos", `${anio}_${mes}`), { q15, q30 });
+        actualizarSumaRegistro();
+    };
+
+    async function cargarP() {
+        const mes = listaMeses[new Date().getMonth()];
+        const anio = new Date().getFullYear().toString();
+        const dS = await getDoc(doc(db, "presupuestos", `${anio}_${mes}`));
+        if(dS.exists()) {
+            document.getElementById("pres15").value = dS.data().q15;
+            document.getElementById("pres30").value = dS.data().q30;
+        }
+    }
+
+    function actualizarGraficos() {
+        const dataM = listaMeses.map(m => todosLosGastos.filter(g => g.mes === m && g.fecha.includes("2026")).reduce((s, c) => s + c.monto, 0));
+        if(chartL) chartL.destroy();
+        chartL = new Chart(document.getElementById('chartLineal'), {
+            type: 'line',
+            data: { labels: listaMeses, datasets: [{ label: 'Gasto Mensual 2026', data: dataM, borderColor: '#2563eb', fill: true, backgroundColor: 'rgba(37, 99, 235, 0.1)' }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const dataC = listaCats.map(c => todosLosGastos.filter(g => g.categoria === c).reduce((s, c) => s + c.monto, 0));
+        if(chartB) chartB.destroy();
+        chartB = new Chart(document.getElementById('chartBarras'), {
+            type: 'bar',
+            data: { labels: listaCats.map(c => c.split(' ')[1]), datasets: [{ label: 'Gasto por Categoría', data: dataC, backgroundColor: '#1e293b' }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
 
     document.getElementById("btnGuardar").onclick = async () => {
         const com = document.getElementById("comercio").value;
         const mon = document.getElementById("monto").value;
-        if(!com || !mon || mesesRegistroSeleccionados.length === 0) return alert("Llena los campos y selecciona al menos un mes");
-        
+        const fec = document.getElementById("fecha").value;
+        if(!com || !mon || !fec) return alert("Faltan datos");
         await addDoc(colRef, {
-            fecha: document.getElementById("fecha").value,
-            mes: mesesRegistroSeleccionados[0], // Se guarda con el primer mes seleccionado
+            fecha: fec,
+            mes: listaMeses[new Date(fec + "T00:00:00").getMonth()],
             categoria: document.getElementById("categoria").value,
             comercio: com,
             monto: Number(mon),
@@ -329,62 +338,19 @@
         limpiar();
     };
 
-    window.prepararEdit = (id) => {
-        const g = todosLosGastos.find(x => x.id === id);
-        document.getElementById("editId").value = id;
-        document.getElementById("fecha").value = g.fecha;
-        document.getElementById("categoria").value = g.categoria;
-        document.getElementById("comercio").value = g.comercio;
-        document.getElementById("monto").value = g.monto;
-        
-        // Sincronizar chips de registro con el mes del gasto a editar
-        mesesRegistroSeleccionados.length = 0;
-        mesesRegistroSeleccionados.push(g.mes);
-        actualizarInterfazChips("mesesRegistro", listaMeses, mesesRegistroSeleccionados);
-
-        document.getElementById("btnGuardar").style.display = "none";
-        document.getElementById("btnActualizar").style.display = "flex";
-        document.getElementById("btnCancelar").style.display = "flex";
-        switchTab('gastos');
+    window.switchTab = (id) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 'resumen') setTimeout(actualizarGraficos, 100);
     };
 
-    document.getElementById("btnActualizar").onclick = async () => {
-        const id = document.getElementById("editId").value;
-        await updateDoc(doc(db, "gastos", id), {
-            fecha: document.getElementById("fecha").value,
-            mes: mesesRegistroSeleccionados[0],
-            categoria: document.getElementById("categoria").value,
-            comercio: document.getElementById("comercio").value,
-            monto: Number(document.getElementById("monto").value)
-        });
-        limpiar();
-        switchTab('historial');
-    };
-
-    window.limpiar = () => {
-        document.getElementById("comercio").value = "";
-        document.getElementById("monto").value = "";
-        document.getElementById("editId").value = "";
-        document.getElementById("btnGuardar").style.display = "flex";
-        document.getElementById("btnActualizar").style.display = "none";
-        document.getElementById("btnCancelar").style.display = "none";
-        document.getElementById('fecha').valueAsDate = new Date();
-    };
-
-    window.calcStats = () => {
-        const pres = Number(document.getElementById("inputPresupuesto").value);
-        const gastado = window.currentTotalSum || 0;
-        document.getElementById("valPres").innerText = `₡${pres.toLocaleString()}`;
-        document.getElementById("valGasto").innerText = `₡${gastado.toLocaleString()}`;
-        document.getElementById("valLibre").innerText = `₡${(pres - gastado).toLocaleString()}`;
-    };
-
-    document.getElementById("btnExportar").onclick = () => {
-        const ws = XLSX.utils.json_to_sheet(todosLosGastos);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Gastos");
-        XLSX.writeFile(wb, "Gomez_Finance.xlsx");
-    };
+    renderizarChecks("checksRegistro", mesesReg, actualizarSumaRegistro);
+    renderizarChecks("checksHistorial", mesesHist, renderizarTablaHistorial);
+    cargarP();
+    document.getElementById('fecha').valueAsDate = new Date();
+    setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
 </script>
 </body>
 </html>

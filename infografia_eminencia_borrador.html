@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografía — Eminencia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .infografia {
+    width: 800px;
+    background: #1a1a2e;
+    border-radius: 18px;
+    overflow: hidden;
+    padding: 0 0 36px 0;
+  }
+
+  /* CABECERA */
+  .cabecera {
+    background: #e07b2a;
+    padding: 28px 40px 22px;
+    text-align: center;
+  }
+  .cabecera h1 {
+    font-size: 34px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .cabecera p {
+    font-size: 13px;
+    color: #fff3e0;
+    margin-top: 6px;
+    font-weight: 400;
+  }
+
+  /* SECCIONES INTERNAS */
+  .seccion {
+    padding: 24px 40px 0;
+  }
+
+  .etiqueta {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e07b2a;
+    margin-bottom: 10px;
+  }
+
+  /* CAJA DE DEFINICIÓN */
+  .definicion {
+    background: #ffffff10;
+    border-left: 4px solid #e07b2a;
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    margin-bottom: 8px;
+  }
+  .definicion p {
+    font-size: 14px;
+    color: #f0f0f0;
+    line-height: 1.7;
+  }
+  .definicion p strong {
+    color: #e07b2a;
+    font-weight: 700;
+  }
+
+  /* PILLARES */
+  .pilares {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .pilar {
+    background: #ffffff0f;
+    border: 1px solid #ffffff20;
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .pilar .icono {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .pilar h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e07b2a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .pilar p {
+    font-size: 11px;
+    color: #ccc;
+    line-height: 1.5;
+  }
+
+  /* OBSERVACIONES */
+  .observaciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .obs {
+    background: #ffffff0f;
+    border: 1px solid #ffffff18;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .obs h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e07b2a;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .obs p {
+    font-size: 11.5px;
+    color: #ccc;
+    line-height: 1.6;
+  }
+
+  /* ESPECTRO */
+  .espectro {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+  .esp-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 8px;
+    background: #ffffff0a;
+    border: 1px solid #ffffff15;
+    margin: 0 4px;
+  }
+  .esp-item.activo {
+    background: #e07b2a22;
+    border: 2px solid #e07b2a;
+  }
+  .esp-item span {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .esp-item.activo span {
+    color: #e07b2a;
+  }
+  .esp-item small {
+    display: block;
+    font-size: 10px;
+    color: #777;
+    margin-top: 3px;
+  }
+  .esp-item.activo small {
+    color: #e07b2a99;
+  }
+
+  /* NOTA AULA */
+  .nota-aula {
+    background: #e07b2a18;
+    border: 1px solid #e07b2a44;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 8px;
+  }
+  .nota-aula p {
+    font-size: 12.5px;
+    color: #f0d9c0;
+    line-height: 1.7;
+    text-align: center;
+  }
+  .nota-aula p strong {
+    color: #e07b2a;
+  }
+
+  /* SEPARADOR */
+  .sep {
+    height: 1px;
+    background: #ffffff15;
+    margin: 20px 40px 0;
+  }
+
+  /* FUENTE */
+  .fuente {
+    text-align: center;
+    font-size: 10px;
+    color: #555;
+    margin-top: 20px;
+    padding: 0 40px;
+  }
+
+  /* BOTÓN IMPRIMIR */
+  .btn-imprimir {
+    display: block;
+    margin: 20px auto 0;
+    background: #e07b2a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 1px;
+  }
+  .btn-imprimir:hover { background: #c96a1a; }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .infografia { border-radius: 0; width: 100%; }
+    .btn-imprimir { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="infografia">
+
+  <!-- CABECERA -->
+  <div class="cabecera">
+    <h1>Eminencia</h1>
+    <p>Concepto clave — Ley N° 8899 · Sistema Educativo Costarricense · DRESJC 2017</p>
+  </div>
+
+  <!-- DEFINICIÓN -->
+  <div class="seccion" style="margin-top:24px;">
+    <div class="etiqueta">Definición</div>
+    <div class="definicion">
+      <p>Persona que <strong>destaca claramente en lo que hace</strong> — ya sea su trabajo, su profesión o cualquier actividad — porque combina conocimiento, habilidad, dedicación y una forma especial de relacionarse con los demás. No basta con ser bueno en algo: la eminencia es <strong>reconocida y valorada</strong> por quienes la rodean, y su influencia se nota con el tiempo.</p>
+    </div>
+  </div>
+
+  <!-- PILARES -->
+  <div class="seccion" style="margin-top:20px;">
+    <div class="etiqueta">¿Qué la forma?</div>
+    <div class="pilares">
+      <div class="pilar">
+        <span class="icono">📚</span>
+        <h3>Conocimiento</h3>
+        <p>Sabe mucho de lo que hace y sigue aprendiendo</p>
+      </div>
+      <div class="pilar">
+        <span class="icono">⚙️</span>
+        <h3>Habilidad</h3>
+        <p>Lo ejecuta muy bien, con técnica y precisión</p>
+      </div>
+      <div class="pilar">
+        <span class="icono">🎯</span>
+        <h3>Dedicación</h3>
+        <p>Se esfuerza, persiste y no se rinde fácilmente</p>
+      </div>
+      <div class="pilar">
+        <span class="icono">✨</span>
+        <h3>Carisma</h3>
+        <p>Inspira a otros, los mueve y genera impacto</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBSERVACIONES -->
+  <div class="seccion" style="margin-top:20px;">
+    <div class="etiqueta">Observaciones para llegar a consenso</div>
+    <div class="observaciones">
+      <div class="obs">
+        <h3>Es un recorrido, no un punto de llegada</h3>
+        <p>La eminencia viene de la precocidad, el talento y la alta dotación que maduran con los años. No aparece de la nada.</p>
+      </div>
+      <div class="obs">
+        <h3>No es lo mismo que genio</h3>
+        <p>El genio crea algo de valor universal y eterno. La eminencia actúa dentro de su comunidad y campo específico.</p>
+      </div>
+      <div class="obs">
+        <h3>Saber mucho no basta</h3>
+        <p>Sin capacidad de inspirar o influir en otros, la persona es solo un experto. La eminencia siempre tiene algo que dar.</p>
+      </div>
+      <div class="obs">
+        <h3>El entorno importa mucho</h3>
+        <p>Docentes, familia y escuela tienen el rol de detectarla a tiempo y crear las condiciones para que crezca.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESPECTRO -->
+  <div class="seccion" style="margin-top:20px;">
+    <div class="etiqueta">Lugar en el espectro de capacidades</div>
+    <div class="espectro">
+      <div class="esp-item">
+        <span>Precoz</span>
+        <small>Desarrollo temprano</small>
+      </div>
+      <div class="esp-item">
+        <span>Talentoso</span>
+        <small>Aptitud en un área</small>
+      </div>
+      <div class="esp-item">
+        <span>Prodigio</span>
+        <small>Rendimiento adulto</small>
+      </div>
+      <div class="esp-item activo">
+        <span>Eminencia</span>
+        <small>Aquí estamos</small>
+      </div>
+      <div class="esp-item">
+        <span>Genio</span>
+        <small>Trascendencia universal</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTA AULA -->
+  <div class="seccion" style="margin-top:20px;">
+    <div class="nota-aula">
+      <p>En el contexto de la <strong>Ley 8899</strong>, la eminencia no es algo que el estudiante ya sea, sino algo que puede llegar a ser si se identifica a tiempo y se le dan las oportunidades adecuadas. El papel del <strong>docente, la familia y la escuela</strong> es crear ese camino.</p>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <div class="fuente">Fuente: Ley N° 8899 y Reglamento 38808-MEP — Departamento de Asesoría Pedagógica, DRESJC, 2017</div>
+
+  <button class="btn-imprimir" onclick="window.print()">Imprimir / Guardar como PDF</button>
+
+</div>
+
+</body>
+</html>
