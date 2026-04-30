@@ -11,72 +11,93 @@
             --primary: #2563eb; --bg: #f5f6fb; --card: #ffffff; --ink: #0f1117;
             --muted: #8b8fa8; --border: #e4e6f0; --danger: #ef4444; --success: #16a34a;
             --radius: 14px; --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --debito-color: #8b5cf6; --credito-color: #2563eb;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); padding-bottom: 40px; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); padding-bottom: 80px; }
+        
         .header { background: var(--ink); padding: 18px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .header-logo { font-size: 20px; font-weight: 700; }
         .header-logo span { color: #60a5fa; }
+        
+        /* Tabs Superiores */
         .nav-tabs { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius); padding: 6px; margin: 20px auto; max-width: 900px; box-shadow: var(--shadow); width: calc(100% - 32px); }
         .nav-tab { flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s; text-align: center; font-size: 11px; text-transform: uppercase; }
         .nav-tab.active { background: var(--ink); color: #fff; }
+
+        /* Barra Inferior */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: flex; border-top: 1px solid var(--border); padding: 10px; gap: 10px; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .btn-nav-bottom { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 12px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-debito { background: #f3e8ff; color: var(--debito-color); }
+        .btn-credito { background: #dbeafe; color: var(--credito-color); }
+        .btn-debito.active { background: var(--debito-color); color: white; transform: scale(1.05); }
+        .btn-credito.active { background: var(--credito-color); color: white; transform: scale(1.05); }
+
         .container { max-width: 950px; margin: 0 auto; padding: 0 16px; }
         .view { display: none; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 16px; }
         .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
+        
         .check-group { display: flex; flex-wrap: wrap; gap: 8px; background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid var(--border); max-height: 120px; overflow-y: auto; width: 100%; }
-        .check-item { display: flex; align-items: center; gap: 6px; background: white; padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; user-select: none; }
+        .check-item { display: flex; align-items: center; gap: 6px; background: white; padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; }
         .check-item.active { border-color: var(--primary); background: #eff6ff; }
+        
         .btn { padding: 12px 20px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .btn-primary { background: var(--primary); color: #fff; width: 100%; }
-        .btn-success { background: var(--success); color: white; width: 100%; }
         .btn-ghost { background: #f1f5f9; color: var(--ink); border: 1px solid var(--border); }
-        .btn-small { padding: 4px 8px; font-size: 9px; text-transform: uppercase; background: var(--ink); color: white; border-radius: 4px; cursor: pointer; border: none; }
+        .btn-small { padding: 4px 8px; font-size: 9px; text-transform: uppercase; background: var(--ink); color: white; border-radius: 4px; border: none; }
+        
         .live-sum-card { background: var(--ink); color: white; border-radius: var(--radius); padding: 20px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
         .live-sum-card div { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
         th { text-align: left; padding: 12px; color: var(--muted); border-bottom: 2px solid var(--border); font-size: 11px; }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         .tachado { text-decoration: line-through; opacity: 0.5; background: #f8fafc; }
-        .badge-pendiente { color: var(--danger); font-weight: bold; font-size: 10px; }
-        .badge-pagado { color: var(--success); font-weight: bold; font-size: 10px; }
+        
+        .badge-cuenta { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
+        .badge-credito { background: #dbeafe; color: var(--primary); }
+        .badge-debito { background: #f3e8ff; color: var(--debito-color); }
         .chart-box { height: 300px; margin-top: 20px; position: relative; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="header-logo">Gómez<span>Finance</span> 💎</div>
+    <div class="header-logo">Gómez<span>Finance</span> 💎 <small id="modoActual" style="font-size: 10px; color: #60a5fa;"></small></div>
     <div id="reloj" style="font-size: 12px; font-family: 'DM Mono';"></div>
 </div>
 
 <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('gastos')">Registro</button>
-    <button class="nav-tab" onclick="switchTab('historial')">Historial</button>
-    <button class="nav-tab" onclick="switchTab('resumen')">Analítica</button>
+    <button class="nav-tab active" id="tab-gastos" onclick="switchTab('gastos')">Registro</button>
+    <button class="nav-tab" id="tab-historial" onclick="switchTab('historial')">Historial</button>
+    <button class="nav-tab" id="tab-resumen" onclick="switchTab('resumen')">Analítica</button>
 </nav>
 
 <div class="container">
+    <!-- VISTA REGISTRO -->
     <div id="view-gastos" class="view active">
         <div class="card">
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label>Filtro de Suma Mensual</label>
+                    <label>Meses a Sumar</label>
                     <button class="btn-small" onclick="toggleTodos('registro')">Todos</button>
                 </div>
                 <div class="check-group" id="checksRegistro"></div>
             </div>
-            <div class="card-title" style="margin-top: 20px;" id="tituloForm">📝 Registrar Gasto</div>
+            <div class="card-title" style="margin-top: 20px;" id="tituloForm">📝 Nuevo Registro</div>
             <div class="form-grid">
                 <div class="form-group"><label>Fecha</label><input type="date" id="fecha"></div>
                 <div class="form-group"><label>Categoría</label><select id="categoria"></select></div>
-                <div class="form-group"><label>Detalle</label><input type="text" id="comercio" placeholder="Ej: Supermercado"></div>
+                <div class="form-group"><label>Detalle</label><input type="text" id="comercio" placeholder="Ej: Pago de Casa"></div>
                 <div class="form-group"><label>Monto (₡)</label><input type="number" id="monto" placeholder="0"></div>
             </div>
             <div style="margin-top: 15px; display: flex; gap: 8px;">
@@ -84,18 +105,19 @@
                 <button id="btnActualizar" class="btn" style="display:none; background:var(--success); color:white; width: 100%;" onclick="actualizarRegistro()">🔄 Actualizar Registro</button>
                 <button id="btnCancelar" class="btn btn-ghost" style="display:none;" onclick="limpiarFormulario()">Cancelar</button>
             </div>
-            <div class="live-sum-card">
-                <div><small>Gasto Mes Selec.</small><div id="sumaRegistro">₡0</div></div>
-                <div style="text-align: right;"><small>Balance (Presupuesto)</small><div id="balanceRegistro">₡0</div></div>
+            <div class="live-sum-card" id="cardSumaColor">
+                <div><small id="txtSumaMes">Gasto Mes</small><div id="sumaRegistro">₡0</div></div>
+                <div style="text-align: right;"><small>Presupuesto</small><div id="balanceRegistro">₡0</div></div>
             </div>
         </div>
     </div>
 
+    <!-- VISTA HISTORIAL -->
     <div id="view-historial" class="view">
         <div class="card">
-            <div class="card-title">📋 Historial y Pago Inteligente</div>
+            <div class="card-title">📋 Listado de Movimientos</div>
             
-            <div style="background: #f8fafc; border: 1.5px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+            <div id="seccionPagoInteligente" style="background: #f8fafc; border: 1.5px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                 <label style="color: var(--primary); font-size: 10px;">💸 PAGO INTELIGENTE (FIFO)</label>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
                     <input type="number" id="inputAbono" placeholder="₡ Monto a abonar..." style="flex: 2;">
@@ -106,8 +128,8 @@
             <div class="form-grid" style="margin-bottom: 15px;">
                 <div class="form-group"><label>Meses</label><div class="check-group" id="checksHistorial"></div></div>
                 <div class="form-group">
-                    <label>Filtros</label>
-                    <input type="text" id="filtroBusqueda" placeholder="🔍 Buscar detalle..." oninput="renderizarTablaHistorial()">
+                    <label>Buscador</label>
+                    <input type="text" id="filtroBusqueda" placeholder="🔍 Buscar..." oninput="renderizarTablaHistorial()">
                     <select id="filtroCategoria" onchange="renderizarTablaHistorial()" style="margin-top:5px;"><option value="">Todas las Categorías</option></select>
                 </div>
             </div>
@@ -115,7 +137,7 @@
             <div class="live-sum-card" style="background: #1e293b; margin-bottom: 10px;">
                 <div><small>Pagado</small><div id="sumaPagados" style="color: var(--success);">₡0</div></div>
                 <div style="text-align: center;"><small>Pendiente</small><div id="sumaPendientes" style="color: var(--danger);">₡0</div></div>
-                <div style="text-align: right;"><small>Diferencia</small><div id="sumaDiferencia">₡0</div></div>
+                <div style="text-align: right;"><small>Total</small><div id="sumaDiferencia">₡0</div></div>
             </div>
 
             <div id="areaPagar" style="display: none; background: #eff6ff; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px dashed var(--primary); text-align: center;">
@@ -134,6 +156,7 @@
         </div>
     </div>
 
+    <!-- VISTA ANALITICA -->
     <div id="view-resumen" class="view">
         <div class="card">
              <div class="card-title">💰 Presupuesto Mensual</div>
@@ -143,14 +166,20 @@
              </div>
         </div>
         <div class="card">
-            <div class="card-title">📈 Gasto Mensual 2026</div>
+            <div class="card-title">📈 Evolución Anual</div>
             <div class="chart-box"><canvas id="chartLineal"></canvas></div>
         </div>
         <div class="card">
-            <div class="card-title">📊 Gastos por Categoría</div>
+            <div class="card-title">📊 Distribución por Categoría</div>
             <div class="chart-box"><canvas id="chartBarras"></canvas></div>
         </div>
     </div>
+</div>
+
+<!-- BARRA DE NAVEGACIÓN INFERIOR -->
+<div class="bottom-nav">
+    <button id="btnNavDebito" class="btn-nav-bottom btn-debito active" onclick="setModo('debito')">💰 REGISTROS DÉBITO</button>
+    <button id="btnNavCredito" class="btn-nav-bottom btn-credito" onclick="setModo('credito')">💳 REGISTROS CRÉDITO</button>
 </div>
 
 <script type="module">
@@ -174,12 +203,36 @@
     let seleccionadosIds = [];
     let chartLineal = null, chartBarras = null;
     let editId = null;
+    let modoActual = 'debito'; // Modo inicial
+
     const CLAVE = "212630$";
     const listaMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    const listaCats = ["🛒 Supermercado", "⛽ Combustible", "💊 Salud", "🍔 Restaurantes", "💡 Servicios", "🏠 Vivienda", "🚌 Transporte", "🎭 Recreación", "🐾 Mascotas", "✨ Otros"];
+    const listaCats = ["🏠 Casa", "💧 Agua", "⚡ Luz", "📱 Celular", "🚗 Cuota Carro", "🛒 Supermercado", "⛽ Combustible", "💊 Salud", "🍔 Restaurantes", "💡 Servicios", "🚌 Transporte", "🎭 Recreación", "🐾 Mascotas", "✨ Otros"];
 
     let mesesReg = [listaMeses[new Date().getMonth()]];
     let mesesHist = [listaMeses[new Date().getMonth()]];
+
+    // --- MANEJO DE MODOS (DÉBITO / CRÉDITO) ---
+    window.setModo = (modo) => {
+        modoActual = modo;
+        
+        // Actualizar UI de botones
+        document.getElementById('btnNavDebito').classList.toggle('active', modo === 'debito');
+        document.getElementById('btnNavCredito').classList.toggle('active', modo === 'credito');
+        
+        // Estética según modo
+        const color = modo === 'debito' ? 'var(--debito-color)' : 'var(--credito-color)';
+        document.getElementById('modoActual').innerText = modo.toUpperCase();
+        document.getElementById('cardSumaColor').style.background = modo === 'debito' ? '#4c1d95' : '#1e3a8a';
+        
+        // Mostrar/Ocultar pago inteligente solo en crédito si se desea, o dejar en ambos
+        // document.getElementById('seccionPagoInteligente').style.display = modo === 'credito' ? 'block' : 'none';
+
+        limpiarFormulario();
+        renderizarTablaHistorial();
+        actualizarSumaRegistro();
+        if (document.getElementById('view-resumen').classList.contains('active')) actualizarGraficos();
+    };
 
     // Inicializar Selects
     listaCats.forEach(c => { 
@@ -195,7 +248,7 @@
         if (document.getElementById('view-resumen').classList.contains('active')) actualizarGraficos();
     });
 
-    // --- FUNCIONES DE REGISTRO Y EDICIÓN ---
+    // --- REGISTRO ---
     window.guardarRegistro = async () => {
         const com = document.getElementById("comercio").value;
         const mon = document.getElementById("monto").value;
@@ -207,7 +260,8 @@
             categoria: document.getElementById("categoria").value,
             comercio: com,
             monto: Number(mon),
-            pagado: false,
+            cuenta: modoActual,
+            pagado: modoActual === 'debito', // Débito suele considerarse pagado al instante
             timestamp: new Date()
         });
         limpiarFormulario();
@@ -221,7 +275,7 @@
         document.getElementById("categoria").value = g.categoria;
         document.getElementById("comercio").value = g.comercio;
         document.getElementById("monto").value = g.monto;
-        document.getElementById("tituloForm").innerText = "🔄 Editando Registro";
+        document.getElementById("tituloForm").innerText = "🔄 Editando " + modoActual;
         document.getElementById("btnGuardar").style.display = "none";
         document.getElementById("btnActualizar").style.display = "block";
         document.getElementById("btnCancelar").style.display = "block";
@@ -248,13 +302,13 @@
         document.getElementById("comercio").value = "";
         document.getElementById("monto").value = "";
         document.getElementById("fecha").valueAsDate = new Date();
-        document.getElementById("tituloForm").innerText = "📝 Registrar Gasto";
+        document.getElementById("tituloForm").innerText = "📝 Nuevo Registro (" + modoActual + ")";
         document.getElementById("btnGuardar").style.display = "block";
         document.getElementById("btnActualizar").style.display = "none";
         document.getElementById("btnCancelar").style.display = "none";
     };
 
-    // --- LÓGICA DE HISTORIAL Y ABONO ---
+    // --- HISTORIAL ---
     window.renderizarTablaHistorial = () => {
         const fCat = document.getElementById("filtroCategoria").value;
         const fBus = document.getElementById("filtroBusqueda").value.toLowerCase();
@@ -262,34 +316,42 @@
         tbody.innerHTML = "";
         let sPag = 0, sPen = 0;
 
-        todosLosGastos.filter(g => mesesHist.includes(g.mes) && (fCat === "" || g.categoria === fCat) && g.comercio.toLowerCase().includes(fBus))
-        .forEach(g => {
+        const filtrados = todosLosGastos
+            .filter(g => {
+                const mismaCuenta = (g.cuenta || 'credito') === modoActual;
+                const mismoMes = mesesHist.includes(g.mes);
+                const mismaCat = (fCat === "" || g.categoria === fCat);
+                const mismoBus = g.comercio.toLowerCase().includes(fBus);
+                return mismaCuenta && mismoMes && mismaCat && mismoBus;
+            })
+            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        filtrados.forEach(g => {
             const esPag = !!g.pagado;
             const esSel = seleccionadosIds.some(x => x.id === g.id);
             esPag ? sPag += g.monto : sPen += g.monto;
 
             tbody.innerHTML += `<tr class="${esPag ? 'tachado' : ''}">
                 <td style="text-align:center">${!esPag ? `<input type="checkbox" ${esSel ? 'checked' : ''} onchange="gestionarSeleccion('${g.id}', this.checked, ${g.monto})">` : '✅'}</td>
-                <td>${g.fecha.split('-').reverse().join('/')}</td>
+                <td><small>${g.fecha.split('-').reverse().join('/')}</small></td>
                 <td><b>${g.comercio}</b><br><small>${g.categoria}</small></td>
                 <td style="text-align:right">₡${g.monto.toLocaleString()}</td>
                 <td style="text-align:center">
                     <button class="btn-small" onclick="prepararEdit('${g.id}')">✏️</button>
-                    ${esPag ? `<button class="btn-small" style="background:var(--primary)" onclick="revertirPago('${g.id}')">↺</button>` : ''}
                     <button class="btn-small" style="background:var(--danger)" onclick="borrarRegistro('${g.id}')">🗑️</button>
                 </td>
             </tr>`;
         });
         document.getElementById("sumaPagados").innerText = "₡" + sPag.toLocaleString();
         document.getElementById("sumaPendientes").innerText = "₡" + sPen.toLocaleString();
-        document.getElementById("sumaDiferencia").innerText = "₡" + (sPen - sPag).toLocaleString();
+        document.getElementById("sumaDiferencia").innerText = "₡" + (sPen + sPag).toLocaleString();
         actualizarUISeleccion();
     };
 
     window.seleccionarPorMonto = () => {
         const abono = Number(document.getElementById("inputAbono").value);
         if(!abono) return alert("Ingrese monto");
-        const pends = todosLosGastos.filter(g => !g.pagado).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+        const pends = todosLosGastos.filter(g => (g.cuenta || 'credito') === modoActual && !g.pagado).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
         let acc = 0; seleccionadosIds = [];
         for(let g of pends) {
             if(acc + g.monto <= abono) { acc += g.monto; seleccionadosIds.push({id: g.id, monto: g.monto}); }
@@ -317,10 +379,6 @@
         renderizarTablaHistorial();
     };
 
-    window.revertirPago = async (id) => {
-        await updateDoc(doc(db, "gastos", id), { pagado: false });
-    };
-
     window.borrarRegistro = async (id) => {
         if(confirm("¿Eliminar?")) {
             const p = prompt("Clave:");
@@ -328,47 +386,82 @@
         }
     };
 
-    // --- ANALÍTICA Y GRÁFICOS ---
+    // --- ANALÍTICA ---
     function actualizarGraficos() {
         const ctxL = document.getElementById('chartLineal').getContext('2d');
         const ctxB = document.getElementById('chartBarras').getContext('2d');
-        const dataMeses = listaMeses.map(m => todosLosGastos.filter(g => g.mes === m && g.fecha.includes("2026")).reduce((s, c) => s + c.monto, 0));
-        const dataCats = listaCats.map(c => todosLosGastos.filter(g => g.categoria === c).reduce((s, c) => s + c.monto, 0));
+        
+        const misGastos = todosLosGastos.filter(g => (g.cuenta || 'credito') === modoActual);
+        
+        const dataMeses = listaMeses.map(m => misGastos.filter(g => g.mes === m && g.fecha.includes("2026")).reduce((s, c) => s + c.monto, 0));
+        const dataCats = listaCats.map(c => misGastos.filter(g => g.categoria === c).reduce((s, c) => s + c.monto, 0));
 
         if(chartLineal) chartLineal.destroy();
-        chartLineal = new Chart(ctxL, { type: 'line', data: { labels: listaMeses, datasets: [{ label: 'Gastos 2026', data: dataMeses, borderColor: '#2563eb', tension: 0.3, fill: true, backgroundColor: 'rgba(37, 99, 235, 0.1)' }] }, options: { responsive: true, maintainAspectRatio: false }});
+        chartLineal = new Chart(ctxL, { 
+            type: 'line', 
+            data: { 
+                labels: listaMeses, 
+                datasets: [{ 
+                    label: 'Anual ' + modoActual, 
+                    data: dataMeses, 
+                    borderColor: modoActual === 'debito' ? '#8b5cf6' : '#2563eb', 
+                    tension: 0.3, fill: true, backgroundColor: 'rgba(0,0,0,0.05)' 
+                }] 
+            }, 
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
         if(chartBarras) chartBarras.destroy();
-        chartBarras = new Chart(ctxB, { type: 'bar', data: { labels: listaCats.map(c => c.split(' ')[1]), datasets: [{ label: 'Monto por Categoría', data: dataCats, backgroundColor: '#1e293b' }] }, options: { responsive: true, maintainAspectRatio: false }});
+        chartBarras = new Chart(ctxB, { 
+            type: 'bar', 
+            data: { 
+                labels: listaCats.map(c => c.split(' ')[1]), 
+                datasets: [{ 
+                    label: 'Por Categoría', 
+                    data: dataCats, 
+                    backgroundColor: modoActual === 'debito' ? '#8b5cf6' : '#1e293b' 
+                }] 
+            }, 
+            options: { responsive: true, maintainAspectRatio: false }
+        });
     }
 
     window.guardarPresupuesto = async () => {
         const mes = listaMeses[new Date().getMonth()];
         const anio = new Date().getFullYear().toString();
-        await setDoc(doc(db, "presupuestos", `${anio}_${mes}`), { q15: document.getElementById("pres15").value, q30: document.getElementById("pres30").value });
+        // Presupuestos separados por cuenta
+        await setDoc(doc(db, "presupuestos", `${anio}_${mes}_${modoActual}`), { q15: document.getElementById("pres15").value, q30: document.getElementById("pres30").value });
         actualizarSumaRegistro();
     };
 
     window.actualizarSumaRegistro = async () => {
-        const totalG = todosLosGastos.filter(g => mesesReg.includes(g.mes)).reduce((acc, c) => acc + c.monto, 0);
+        const totalG = todosLosGastos
+            .filter(g => (g.cuenta || 'credito') === modoActual && mesesReg.includes(g.mes))
+            .reduce((acc, c) => acc + c.monto, 0);
+            
         document.getElementById("sumaRegistro").innerText = "₡" + totalG.toLocaleString();
         const mes = listaMeses[new Date().getMonth()];
-        const dS = await getDoc(doc(db, "presupuestos", `2026_${mes}`));
+        const dS = await getDoc(doc(db, "presupuestos", `2026_${mes}_${modoActual}`));
+        
+        const bDiv = document.getElementById("balanceRegistro");
         if(dS.exists()){
             const bal = (Number(dS.data().q15) + Number(dS.data().q30)) - totalG;
-            const bDiv = document.getElementById("balanceRegistro");
             bDiv.innerText = "₡" + bal.toLocaleString();
             bDiv.style.color = bal < 0 ? "red" : "#60a5fa";
+            document.getElementById("pres15").value = dS.data().q15;
+            document.getElementById("pres30").value = dS.data().q30;
+        } else {
+            bDiv.innerText = "₡0";
+            document.getElementById("pres15").value = "";
+            document.getElementById("pres30").value = "";
         }
     };
 
-    // Navegación
     window.switchTab = (id) => {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('view-' + id).classList.add('active');
-        const tabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(btn => btn.getAttribute('onclick').includes(id));
-        if(tabBtn) tabBtn.classList.add('active');
+        document.getElementById('tab-' + id).classList.add('active');
         if(id === 'resumen') setTimeout(actualizarGraficos, 200);
     };
 
@@ -397,20 +490,11 @@
     };
 
     // Inicio
+    setModo('debito');
     renderizarChecks("checksRegistro", mesesReg, actualizarSumaRegistro);
     renderizarChecks("checksHistorial", mesesHist, renderizarTablaHistorial);
     document.getElementById('fecha').valueAsDate = new Date();
     setInterval(() => { document.getElementById('reloj').innerText = new Date().toLocaleTimeString(); }, 1000);
-    
-    // Cargar presupuesto inicial en los inputs
-    (async () => {
-        const mes = listaMeses[new Date().getMonth()];
-        const dS = await getDoc(doc(db, "presupuestos", `2026_${mes}`));
-        if(dS.exists()) {
-            document.getElementById("pres15").value = dS.data().q15;
-            document.getElementById("pres30").value = dS.data().q30;
-        }
-    })();
 </script>
 </body>
 </html>
