@@ -20,12 +20,10 @@
         .header-logo { font-size: 20px; font-weight: 700; }
         .header-logo span { color: #60a5fa; }
         
-        /* Tabs Superiores */
         .nav-tabs { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius); padding: 6px; margin: 20px auto; max-width: 900px; box-shadow: var(--shadow); width: calc(100% - 32px); }
         .nav-tab { flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s; text-align: center; font-size: 11px; text-transform: uppercase; }
         .nav-tab.active { background: var(--ink); color: #fff; }
 
-        /* Barra Inferior */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: flex; border-top: 1px solid var(--border); padding: 10px; gap: 10px; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
         .btn-nav-bottom { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 12px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-debito { background: #f3e8ff; color: var(--debito-color); }
@@ -64,8 +62,6 @@
         .tachado { text-decoration: line-through; opacity: 0.5; background: #f8fafc; }
         
         .badge-cuenta { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
-        .badge-credito { background: #dbeafe; color: var(--primary); }
-        .badge-debito { background: #f3e8ff; color: var(--debito-color); }
         .chart-box { height: 300px; margin-top: 20px; position: relative; }
     </style>
 </head>
@@ -83,7 +79,6 @@
 </nav>
 
 <div class="container">
-    <!-- VISTA REGISTRO -->
     <div id="view-gastos" class="view active">
         <div class="card">
             <div class="form-group">
@@ -112,13 +107,12 @@
         </div>
     </div>
 
-    <!-- VISTA HISTORIAL -->
     <div id="view-historial" class="view">
         <div class="card">
             <div class="card-title">📋 Listado de Movimientos</div>
             
             <div id="seccionPagoInteligente" style="background: #f8fafc; border: 1.5px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-                <label style="color: var(--primary); font-size: 10px;">💸 PAGO INTELIGENTE (FIFO)</label>
+                <label style="color: var(--primary); font-size: 10px;">💸 PAGO INTELIGENTE (BÚSQUEDA PRECISA)</label>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
                     <input type="number" id="inputAbono" placeholder="₡ Monto a abonar..." style="flex: 2;">
                     <button class="btn btn-primary" onclick="seleccionarPorMonto()" style="flex: 1; font-size: 11px;">Seleccionar</button>
@@ -144,7 +138,7 @@
                 <p style="font-size: 13px; font-weight: bold; color: var(--primary); margin-bottom: 10px;">
                     Seleccionado: <span id="montoSeleccionado">₡0</span>
                 </p>
-                <button class="btn btn-success" onclick="confirmarPagoMasivo()">✅ Confirmar Pago</button>
+                <button class="btn" style="background: var(--success); color:white; width:100%" onclick="confirmarPagoMasivo()">✅ Confirmar Pago</button>
             </div>
 
             <div style="overflow-x:auto">
@@ -156,7 +150,6 @@
         </div>
     </div>
 
-    <!-- VISTA ANALITICA -->
     <div id="view-resumen" class="view">
         <div class="card">
              <div class="card-title">💰 Presupuesto Mensual</div>
@@ -176,7 +169,6 @@
     </div>
 </div>
 
-<!-- BARRA DE NAVEGACIÓN INFERIOR -->
 <div class="bottom-nav">
     <button id="btnNavDebito" class="btn-nav-bottom btn-debito active" onclick="setModo('debito')">💰 REGISTROS DÉBITO</button>
     <button id="btnNavCredito" class="btn-nav-bottom btn-credito" onclick="setModo('credito')">💳 REGISTROS CRÉDITO</button>
@@ -203,7 +195,7 @@
     let seleccionadosIds = [];
     let chartLineal = null, chartBarras = null;
     let editId = null;
-    let modoActual = 'debito'; // Modo inicial
+    let modoActual = 'debito';
 
     const CLAVE = "212630$";
     const listaMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -212,29 +204,18 @@
     let mesesReg = [listaMeses[new Date().getMonth()]];
     let mesesHist = [listaMeses[new Date().getMonth()]];
 
-    // --- MANEJO DE MODOS (DÉBITO / CRÉDITO) ---
     window.setModo = (modo) => {
         modoActual = modo;
-        
-        // Actualizar UI de botones
         document.getElementById('btnNavDebito').classList.toggle('active', modo === 'debito');
         document.getElementById('btnNavCredito').classList.toggle('active', modo === 'credito');
-        
-        // Estética según modo
-        const color = modo === 'debito' ? 'var(--debito-color)' : 'var(--credito-color)';
         document.getElementById('modoActual').innerText = modo.toUpperCase();
         document.getElementById('cardSumaColor').style.background = modo === 'debito' ? '#4c1d95' : '#1e3a8a';
-        
-        // Mostrar/Ocultar pago inteligente solo en crédito si se desea, o dejar en ambos
-        // document.getElementById('seccionPagoInteligente').style.display = modo === 'credito' ? 'block' : 'none';
-
         limpiarFormulario();
         renderizarTablaHistorial();
         actualizarSumaRegistro();
         if (document.getElementById('view-resumen').classList.contains('active')) actualizarGraficos();
     };
 
-    // Inicializar Selects
     listaCats.forEach(c => { 
         document.getElementById("categoria").innerHTML += `<option value="${c}">${c}</option>`; 
         document.getElementById("filtroCategoria").innerHTML += `<option value="${c}">${c}</option>`; 
@@ -248,7 +229,6 @@
         if (document.getElementById('view-resumen').classList.contains('active')) actualizarGraficos();
     });
 
-    // --- REGISTRO ---
     window.guardarRegistro = async () => {
         const com = document.getElementById("comercio").value;
         const mon = document.getElementById("monto").value;
@@ -261,7 +241,7 @@
             comercio: com,
             monto: Number(mon),
             cuenta: modoActual,
-            pagado: modoActual === 'debito', // Débito suele considerarse pagado al instante
+            pagado: modoActual === 'debito',
             timestamp: new Date()
         });
         limpiarFormulario();
@@ -308,7 +288,6 @@
         document.getElementById("btnCancelar").style.display = "none";
     };
 
-    // --- HISTORIAL ---
     window.renderizarTablaHistorial = () => {
         const fCat = document.getElementById("filtroCategoria").value;
         const fBus = document.getElementById("filtroBusqueda").value.toLowerCase();
@@ -348,15 +327,28 @@
         actualizarUISeleccion();
     };
 
+    // Lógica mejorada de Pago Inteligente
     window.seleccionarPorMonto = () => {
-        const abono = Number(document.getElementById("inputAbono").value);
-        if(!abono) return alert("Ingrese monto");
-        const pends = todosLosGastos.filter(g => (g.cuenta || 'credito') === modoActual && !g.pagado).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-        let acc = 0; seleccionadosIds = [];
-        for(let g of pends) {
-            if(acc + g.monto <= abono) { acc += g.monto; seleccionadosIds.push({id: g.id, monto: g.monto}); }
-            else break;
+        const abonoInput = Number(document.getElementById("inputAbono").value);
+        if(!abonoInput || abonoInput <= 0) return alert("Ingrese un monto válido");
+
+        const pends = todosLosGastos
+            .filter(g => (g.cuenta || 'credito') === modoActual && !g.pagado)
+            .sort((a, b) => new Date(a.fecha) - new Date(a.fecha)); // Por fecha más vieja primero
+
+        let saldoRestante = abonoInput;
+        seleccionadosIds = [];
+
+        for (let g of pends) {
+            // Si el gasto individual cabe en lo que sobra del abono, se selecciona
+            if (g.monto <= saldoRestante) {
+                saldoRestante -= g.monto;
+                seleccionadosIds.push({ id: g.id, monto: g.monto });
+            }
+            if (saldoRestante <= 0) break;
         }
+
+        if (seleccionadosIds.length === 0) alert("No se encontraron deudas que se ajusten a ese monto.");
         renderizarTablaHistorial();
     };
 
@@ -373,7 +365,7 @@
     }
 
     window.confirmarPagoMasivo = async () => {
-        if(!confirm("¿Confirmar pago?")) return;
+        if(!confirm("¿Confirmar pago de los elementos seleccionados?")) return;
         for(let item of seleccionadosIds) await updateDoc(doc(db, "gastos", item.id), { pagado: true });
         seleccionadosIds = [];
         renderizarTablaHistorial();
@@ -386,13 +378,10 @@
         }
     };
 
-    // --- ANALÍTICA ---
     function actualizarGraficos() {
         const ctxL = document.getElementById('chartLineal').getContext('2d');
         const ctxB = document.getElementById('chartBarras').getContext('2d');
-        
         const misGastos = todosLosGastos.filter(g => (g.cuenta || 'credito') === modoActual);
-        
         const dataMeses = listaMeses.map(m => misGastos.filter(g => g.mes === m && g.fecha.includes("2026")).reduce((s, c) => s + c.monto, 0));
         const dataCats = listaCats.map(c => misGastos.filter(g => g.categoria === c).reduce((s, c) => s + c.monto, 0));
 
@@ -429,7 +418,6 @@
     window.guardarPresupuesto = async () => {
         const mes = listaMeses[new Date().getMonth()];
         const anio = new Date().getFullYear().toString();
-        // Presupuestos separados por cuenta
         await setDoc(doc(db, "presupuestos", `${anio}_${mes}_${modoActual}`), { q15: document.getElementById("pres15").value, q30: document.getElementById("pres30").value });
         actualizarSumaRegistro();
     };
@@ -489,7 +477,6 @@
         else { mesesHist = mesesHist.length === 12 ? [] : [...listaMeses]; renderizarChecks("checksHistorial", mesesHist, renderizarTablaHistorial); renderizarTablaHistorial(); }
     };
 
-    // Inicio
     setModo('debito');
     renderizarChecks("checksRegistro", mesesReg, actualizarSumaRegistro);
     renderizarChecks("checksHistorial", mesesHist, renderizarTablaHistorial);
